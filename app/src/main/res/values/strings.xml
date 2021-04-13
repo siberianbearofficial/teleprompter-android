@@ -2,4 +2,5 @@
     <string name="app_name">Teleprompter</string>
     <string name="no_connection">Can not connect to the server</string>
     <string name="wrong_data">Some inputs are incorrect</string>
+    <string name="no_file">Something went wrong while reading the file</string>
 </resources>

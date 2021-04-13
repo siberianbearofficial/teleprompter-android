@@ -43,10 +43,10 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private EditText mainText, speedText, sizeText;
-    private Button button, testButton;
+    private Button button, testButton, fileButton;
     private ScrollTextView scrollTextView;
     private LinearLayout container;
-    private Handler h;
+    private Handler h, f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +59,16 @@ public class MainActivity extends AppCompatActivity {
         speedText = findViewById(R.id.speed);
         sizeText = findViewById(R.id.text_size);
         mainText = findViewById(R.id.text_main);
+        fileButton = findViewById(R.id.buttonFile);
 
-        h = new Handler(Looper.getMainLooper()){
+        h = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                showScrollingText(msg.obj.toString());
+            }
+        };
+
+        f = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 showScrollingText(msg.obj.toString());
@@ -85,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
                 String string = mainText.getText().toString();
                 if (string.equals("")) Toast.makeText(getApplicationContext(), R.string.wrong_data, Toast.LENGTH_LONG).show(); else showScrollingText(string);
             } catch (Exception e) {e.printStackTrace(); Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();}
+        });
+
+        fileButton.setOnClickListener(v -> {
+            chooseFile();
         });
     }
 
@@ -116,16 +128,17 @@ public class MainActivity extends AppCompatActivity {
             {
                 if (resultCode == RESULT_OK)
                 {
-                    Uri chosenFileUri = data.getData();
-
-//                    Cursor cursor = getContentResolver().query( chosenFileUri, null, null, null, null );
-//                    cursor.moveToFirst();
-//                    String filePath = cursor.getString(0);
-//                    cursor.close();
-                    String filePath = chosenFileUri.getPath();
-                    filePath = filePath.split(":")[1];
-                    System.out.println(filePath);
-                    ReadFile(filePath);
+                    Thread thread = new Thread(() -> {
+                        Uri chosenFileUri = data.getData();
+                        String filePath = chosenFileUri.getPath();
+                        filePath = filePath.split(":")[1];
+                        System.out.println(filePath);
+                        Message m = Message.obtain();
+                        try {
+                            m.obj = ReadFile(filePath);
+                        } catch (Exception e) {e.printStackTrace(); m.obj = getString(R.string.no_file); Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();}
+                        f.sendMessage(m);
+                    }); thread.start();
                 }
                 break;
             }
@@ -139,63 +152,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public  boolean isStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v("PERMISSION","Permission is granted");
-                return true;
-            } else {
-
-                Log.v("PERMISSION","Permission is revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                return false;
-            }
-        }
-        else { //permission is automatically granted on sdk<23 upon installation
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
             Log.v("PERMISSION","Permission is granted");
             return true;
+        } else {
+
+            Log.v("PERMISSION","Permission is revoked");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            return false;
         }
     }
 
-    private void ReadFile(String filePathName) {
+    private String ReadFile(String filePathName) {
+        StringBuilder text = new StringBuilder();
         if (isStoragePermissionGranted()) {
-            String text = "";
             try {
-                // открываем поток для чтения
-
                 String storageDirectory = Environment.getExternalStorageDirectory().toString();
                 File file = new File(storageDirectory + "/" + filePathName);
                 FileInputStream inputStream = new FileInputStream(file);
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
                 String str = "";
-                // читаем содержимое
+                boolean flag = false;
                 while ((str = br.readLine()) != null) {
-                    text += str;
+                    if (str.contains("<html")) flag = true;
+                    if (!flag) str += "<br>";
+                    text.append(str);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
             System.out.println(text);
-
-            //Another way
-
-//            String text = "";
-//            BufferedReader br = null;
-//            try {
-//                br = new BufferedReader(new InputStreamReader(
-//                        this.openFileInput(storageDirectory + "/" + filePathName)));
-//                String gotString;
-//                // читаем содержимое
-//                while ((gotString = br.readLine()) != null) {
-//                    text += gotString;
-//                }
-//                br.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            System.out.println(text);
-
         }
+        return text.toString();
     }
 
     private void showScrollingText (String text) {
