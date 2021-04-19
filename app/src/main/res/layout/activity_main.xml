@@ -51,7 +51,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:backgroundTint="@color/purple_200"
-            android:text="Text!" />
+            android:text="Editor!" />
 
         <Button
             android:id="@+id/buttonTest"

@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.TeleprompterAndroid">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -10,18 +11,22 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:requestLegacyExternalStorage="true"
-        android:theme="@style/Theme.TestLibraryScrollingText">
-        <activity android:name="com.example.TeleprompterAndroid.MainActivity">
+        android:theme="@style/Theme.TestLibraryScrollingText"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".PlayActivity" />
+        <activity android:name=".NewMainActivity" />
+        <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".EditorActivity" />
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

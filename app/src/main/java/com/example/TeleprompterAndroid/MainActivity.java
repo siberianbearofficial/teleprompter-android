@@ -18,6 +18,7 @@ import android.os.Message;
 import android.text.Html;
 import android.text.SpannableString;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,10 +44,12 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private EditText mainText, speedText, sizeText;
-    private Button button, testButton, fileButton;
+    private Button button, testButton, fileButton, editorButton;
     private ScrollTextView scrollTextView;
     private LinearLayout container;
     private Handler h, f;
+
+    public static final String url = "https://teleprompter-android-server.siberianbear.repl.co/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         sizeText = findViewById(R.id.text_size);
         mainText = findViewById(R.id.text_main);
         fileButton = findViewById(R.id.buttonFile);
+        //editorButton = findViewById(R.id.editorButton);
 
         h = new Handler(Looper.getMainLooper()) {
             @Override
@@ -89,21 +93,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
         button.setOnClickListener(v -> {
-            try {
-                String string = mainText.getText().toString();
-                if (string.equals("")) Toast.makeText(getApplicationContext(), R.string.wrong_data, Toast.LENGTH_LONG).show(); else showScrollingText(string);
-            } catch (Exception e) {e.printStackTrace(); Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();}
+            Intent intent = new Intent(getApplicationContext(), EditorActivity.class);
+            startActivity(intent);
         });
 
         fileButton.setOnClickListener(v -> {
             chooseFile();
         });
+
+//        editorButton.setOnClickListener(v -> {
+//
+//        });
     }
 
     public Object getHttpResponse() {
         OkHttpClient httpClient = new OkHttpClient();
 
-        String url = "https://teleprompter-android-server.siberianbear.repl.co/";
+
         Request request = new Request.Builder()
                 .url(url)
                 .build();

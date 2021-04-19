@@ -3,4 +3,18 @@
     <string name="no_connection">Can not connect to the server</string>
     <string name="wrong_data">Some inputs are incorrect</string>
     <string name="no_file">Something went wrong while reading the file</string>
+    <string name="title_activity_editor">EditorActivity</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="login_label">Войти</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Пароль</string>
+    <string name="next_button">Дальше</string>
+    <string name="forgot_password">Забыли пароль?</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="title_label_editor">Название</string>
 </resources>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/box_inset_layout_padding"
+    android:orientation="vertical"
+    tools:context=".StartActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/test_font"
+        android:padding="30dp"
+        android:text="@string/login_label"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="36sp" />
+
+    <EditText
+        android:id="@+id/email_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:fontFamily="@font/test_font"
+        android:hint="@string/email_hint"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/password_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:hint="@string/password_hint"
+        android:fontFamily="@font/test_font"
+        android:inputType="textPassword" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="15dp"
+        android:backgroundTint="@color/teal_200"
+        android:fontFamily="@font/test_font"
+        android:onClick="Login"
+        android:text="@string/next_button" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:fontFamily="@font/test_font"
+        android:text="@string/forgot_password" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+
+        android:fontFamily="@font/test_font"
+        android:text="@string/sign_up" />
+</LinearLayout>
