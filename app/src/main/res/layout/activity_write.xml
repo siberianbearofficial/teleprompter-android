@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_write"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".WriteActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/status_write"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Not connected" />
+
+        <Button
+            android:id="@+id/btn_connect_write"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/design_default_color_primary"
+            android:text="Connect" />
+
+        <Button
+            android:id="@+id/btn_sair_write"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/white"
+            android:text="Exit the conversation" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/list_write"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.7" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_weight="0.1"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/input_layout_write"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.8"
+            android:hint="Enter a message..." />
+
+        <ImageButton
+            android:id="@+id/btn_send_write"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.2"
+            android:background="@color/design_default_color_primary"
+            android:src="@android:drawable/ic_menu_send"  />
+
+        <ImageButton
+            android:id="@+id/btn_stop_write"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.2"
+            android:background="@color/purple_200"
+            android:src="@android:drawable/ic_media_pause" />
+    </LinearLayout>
+</LinearLayout>

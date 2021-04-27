@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_read"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".ReadActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/status_read"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Not connected" />
+
+        <Button
+            android:id="@+id/btn_connect_read"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/design_default_color_primary"
+            android:text="Connect" />
+
+        <Button
+            android:id="@+id/btn_sair_read"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/design_default_color_background"
+            android:text="Exit the conversation" />
+    </LinearLayout>
+
+    <!--<TextView
+        android:id="@+id/text_output_read"
+        android:text="TEST"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/container_read_bluetooth" />
+</LinearLayout>

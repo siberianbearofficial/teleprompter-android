@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.chinalwb.are.AREditor;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 
@@ -54,11 +55,11 @@ public class EditorActivity extends AppCompatActivity {
         SaveTextButton.setOnClickListener(v -> {
             String gotText = arEditor.getHtml();
             Thread thread = new Thread(() -> {
-//                try {
-//                    Send(gotText);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    Send(titleET.getText().toString(), gotText);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 startActivity(new Intent(getApplicationContext(), MainActivity.class).putExtra("TEXT", gotText).putExtra("TITLE", titleET.getText().toString()));
             });
             thread.start();
@@ -67,11 +68,11 @@ public class EditorActivity extends AppCompatActivity {
         PlayButton.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), PlayActivity.class).putExtra("TEXT", arEditor.getHtml()).putExtra("TITLE", titleET.getText().toString())));
     }
 
-    private void Send(String text) throws IOException {
+    private void Send (String title, String text) throws IOException {
         OkHttpClient httpClient = new OkHttpClient();
 
         RequestBody jsonBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),
-                "{text: " + text + "}");
+                new Gson().toJson(new Article(title, text)));
 
         Request request = new Request.Builder()
                 .url(MainActivity.url + "postText")
@@ -79,5 +80,15 @@ public class EditorActivity extends AppCompatActivity {
                 .build();
 
         Response response = httpClient.newCall(request).execute();
+        Log.d("RESPONSE", response.body().string());
+    }
+
+    static class Article {
+        private String title;
+        private String text;
+        Article (String title, String text) {
+            this.text = text;
+            this.title = title;
+        }
     }
 }

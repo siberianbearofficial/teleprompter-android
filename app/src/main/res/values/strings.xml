@@ -13,8 +13,9 @@
     <string name="login_label">Войти</string>
     <string name="email_hint">Email</string>
     <string name="password_hint">Пароль</string>
-    <string name="next_button">Дальше</string>
+    <string name="next_button">Далее</string>
     <string name="forgot_password">Забыли пароль?</string>
-    <string name="sign_up">Зарегистрироваться</string>
+    <string name="sign_up">Регистрация</string>
     <string name="title_label_editor">Название</string>
+    <string name="skip">Пропустить</string>
 </resources>
