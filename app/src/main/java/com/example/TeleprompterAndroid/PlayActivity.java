@@ -5,9 +5,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 import android.text.SpannableString;
@@ -15,17 +13,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gamadevelopment.scrolltextview.ScrollTextView;
+import static com.example.TeleprompterAndroid.Consts.PAUSE_MODE;
+import static com.example.TeleprompterAndroid.Consts.PLAY_MODE;
 
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 
 public class PlayActivity extends AppCompatActivity {
 
     private NewScrollTEXT scrollTextView;
     private LinearLayout container;
     private TextView titleTV;
+    private boolean flag;
 
 
     @Override
@@ -35,34 +32,22 @@ public class PlayActivity extends AppCompatActivity {
         container = findViewById(R.id.container_play_activity);
         titleTV = findViewById(R.id.title_play_activity);
 
+        textSize = 10; flag = true;
+
         Intent intent = getIntent();
         titleTV.setText(intent.getStringExtra("TITLE"));
         showScrollingText(intent.getStringExtra("TEXT"));
     }
 
-/*    @Override
-    public void onBackPressed() {
-//        startActivity(new Intent(getApplicationContext(), NewMainActivity.class));
-      textSize = (Flowable<Integer>) changeSize().observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Integer>() {
-          @Override
-          public void accept(Integer integer) throws Exception {
-
-          }
-      });
-    }*/
-
     @Override
     public void onBackPressed() {
-        Message msg = new Message();
-        msg.obj = 20;
-        scrollTextView.changeHandlerMessage(20);
+        textSize += 10;
+        scrollTextView.changeTextSize(textSize);
+
+        scrollTextView.changeMode(flag ? PAUSE_MODE : PLAY_MODE);
+        flag = !flag;
     }
 
-    public Flowable<Integer> changeSize() {
-        return Flowable.just(20);
-    }
-
-    //Flowable<Integer> textSize = Flowable.just(10);
     int textSize;
 
     private void showScrollingText (String text) {
@@ -79,10 +64,7 @@ public class PlayActivity extends AppCompatActivity {
         } catch (Exception e) {e.printStackTrace(); Toast.makeText(getApplicationContext(), R.string.wrong_data, Toast.LENGTH_LONG).show();}
 
         scrollTextView.setSpeed(speed);
-        //scrollTextView.setTextSize(textSize);
-
-
-
+        scrollTextView.setTextSize(textSize);
 
         scrollTextView.setTypeface(ResourcesCompat.getFont(getApplicationContext(), R.font.test_font));
 

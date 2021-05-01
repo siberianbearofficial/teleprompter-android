@@ -11,7 +11,9 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.text.SpannableString;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,7 +24,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 import static com.example.TeleprompterAndroid.Consts.BLUETOOTH_SOLICITATION;
@@ -32,27 +33,32 @@ import static com.example.TeleprompterAndroid.Consts.MESSAGE_READ;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_STATE_CHANGE;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_TOAST;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_WRITE;
+import static com.example.TeleprompterAndroid.Consts.PLAY_MODE;
 import static com.example.TeleprompterAndroid.Consts.STATE_CONNECTED;
 import static com.example.TeleprompterAndroid.Consts.STATE_CONNECTING;
 import static com.example.TeleprompterAndroid.Consts.STATE_LISTEN;
 import static com.example.TeleprompterAndroid.Consts.STATE_NONE;
+import static com.example.TeleprompterAndroid.Consts.PAUSE_MODE;
 import static com.example.TeleprompterAndroid.Consts.STOP_MODE;
 
 public class WriteActivity extends AppCompatActivity {
 
     private TextView status;
+    private EditText inputWrite;
     private Button btnConnect;
     private Button btnLeaveChat;
-    private ListView listView;
     private Dialog dialog;
-    private EditText inputLayout;
     private BluetoothAdapter bluetoothAdapter;
-    private ArrayAdapter<String> chatAdapter;
-    private ArrayList<String> chatMessages;
 
     private ArrayAdapter<String> discoveredDevicesAdapter;
     private BluetoothDevice connectingDevice;
     private WriteController writeController;
+
+    private boolean mirroring = false;
+    private boolean paused = false;
+    private boolean connect = true;
+
+    private String script;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,82 +81,62 @@ public class WriteActivity extends AppCompatActivity {
         }
 
         // Displays dialog with list of devices
-        btnConnect.setOnClickListener(view -> showDevicesDialog());
+        //btnConnect.setOnClickListener(view -> showDevicesDialog());
 
         // will fechat current chat
-        btnLeaveChat.setVisibility(View.INVISIBLE);
-        btnLeaveChat.setOnClickListener(view -> chatLeave());
-
-        // Configure conversation adapters
-        chatMessages = new ArrayList<>();
-        chatAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, chatMessages);
-        listView.setAdapter(chatAdapter);
+        //btnLeaveChat.setVisibility(View.INVISIBLE);
+        //btnLeaveChat.setOnClickListener(view -> chatLeave());
     }
 
-    private Handler handler = new Handler(new Handler.Callback() {
+    private Handler handler = new Handler(Looper.getMainLooper()) {
 
         @Override
-        public boolean handleMessage(Message msg) {
+        public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case STATE_CONNECTED:
                             setStatus("Connected to:" + connectingDevice.getName());
-                            btnConnect.setEnabled(false);
-                            btnConnect.setVisibility(View.INVISIBLE);
-                            btnLeaveChat.setVisibility(View.VISIBLE);
+                            changeScript(script);
+                            //btnConnect.setEnabled(false);
+                            //btnConnect.setVisibility(View.INVISIBLE);
+                            //btnLeaveChat.setVisibility(View.VISIBLE);
                             break;
                         case STATE_CONNECTING:
                             setStatus("Connecting...");
-                            btnConnect.setEnabled(false);
+                            //btnConnect.setEnabled(false);
                             break;
                         case STATE_LISTEN:
                         case STATE_NONE:
-                            setStatus("Not connected");
-                            btnConnect.setEnabled(true);
-                            btnConnect.setVisibility(View.VISIBLE);
-                            btnLeaveChat.setVisibility(View.INVISIBLE);
-                            chatMessages.clear();
-                            chatAdapter.notifyDataSetChanged();
+                            //setStatus("Not connected");
+                            //btnConnect.setEnabled(true);
+                            //btnConnect.setVisibility(View.VISIBLE);
+                            //btnLeaveChat.setVisibility(View.INVISIBLE);
                             break;
                     }
-                    break;
-                case MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-
-                    String writeMessage = new String(writeBuf);
-                    chatMessages.add("Me: " + writeMessage);
-                    chatAdapter.notifyDataSetChanged();
-                    break;
-                case MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
-
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-                    chatMessages.add(connectingDevice.getName() + ":  " + readMessage);
-                    chatAdapter.notifyDataSetChanged();
                     break;
                 case MESSAGE_DEVICE_OBJECT:
                     connectingDevice = msg.getData().getParcelable(DEVICE_OBJECT);
                     Toast.makeText(getApplicationContext(), "Connected to " + connectingDevice.getName(), Toast.LENGTH_SHORT).show();
+                    changeScript(script);
                     break;
                 case MESSAGE_TOAST:
                     Toast.makeText(getApplicationContext(), msg.getData().getString("toast"),
                             Toast.LENGTH_SHORT).show();
                     break;
             }
-            return false;
         }
-    });
+    };
 
     private void setStatus(String s) {
         status.setText(s);
     }
 
     public void chatLeave(){
-        btnLeaveChat.setVisibility(View.INVISIBLE);
+        //btnLeaveChat.setVisibility(View.INVISIBLE);
         if (writeController != null)
             writeController.stop();
-        btnConnect.setVisibility(View.VISIBLE);
+        //btnConnect.setVisibility(View.VISIBLE);
 
     }
 
@@ -256,25 +242,39 @@ public class WriteActivity extends AppCompatActivity {
     }
 
     private void findViewsByIds() {
-        status = findViewById(R.id.status_write);
-        btnConnect = findViewById(R.id.btn_connect_write);
-        btnLeaveChat = findViewById(R.id.btn_sair_write);
-        listView = findViewById(R.id.list_write);
-        inputLayout = findViewById(R.id.input_layout_write);
-        View btnSend = findViewById(R.id.btn_send_write);
-        View btnStop = findViewById(R.id.btn_stop_write);
+        //status = findViewById(R.id.status_write);
+        status = findViewById(R.id.status_write2);
+        //btnConnect = findViewById(R.id.btn_connect_write);
+        //btnLeaveChat = findViewById(R.id.btn_sair_write);
+        //inputWrite = findViewById(R.id.input_write);
+        //View btnSend = findViewById(R.id.btn_send_write);
+        //View btnStop = findViewById(R.id.btn_stop_write);
 
-        btnStop.setOnClickListener(v -> changeMode(STOP_MODE));
+        //btnStop.setOnClickListener(v -> changeMode(PAUSE_MODE));
 
-        //TODO: Add more buttons with another functions
-        btnSend.setOnClickListener(view -> {
-            if (inputLayout.getText().toString().equals("")) {
-                Toast.makeText(WriteActivity.this, "Type some text", Toast.LENGTH_SHORT).show();
-            } else {
-                changeScript(inputLayout.getText().toString());
-                inputLayout.setText("");
-            }
-        });
+        /*btnSend.setOnClickListener(view -> {
+            changeScript(inputWrite.getText().toString());
+            inputWrite.setText("");
+        });*/
+    }
+
+    public void Stop (View view) {
+        changeMode(STOP_MODE);
+    }
+
+    public void Pause (View view) {
+        paused = !paused;
+        changeMode((!paused) ? PAUSE_MODE : PLAY_MODE);
+    }
+
+    public void Mirror (View view) {
+        mirroring = !mirroring;
+        changeMirroring(mirroring);
+    }
+
+    public void Connect (View view) {
+        if (connect) showDevicesDialog(); else chatLeave();
+        connect = !connect;
     }
 
     private void changeScript (String script) {
@@ -285,6 +285,8 @@ public class WriteActivity extends AppCompatActivity {
 
         if (script.length() > 0) {
             writeController.changeScript(script);
+        } else {
+            Toast.makeText(getApplicationContext(), "Type some text", Toast.LENGTH_SHORT).show();
         }
     }
 

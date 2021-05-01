@@ -22,7 +22,9 @@ public class Consts {
 
     public static final int BLUETOOTH_SOLICITATION = 14;
 
-    public static final int STOP_MODE = 15;
+    public static final int PAUSE_MODE = 15;
+    public static final int PLAY_MODE = 16;
+    public static final int STOP_MODE = 17;
 
     public static final String DEVICE_OBJECT = "device_name";
     public static final String SYSTEM_REGEX = "_015CodeSYSregex37_";

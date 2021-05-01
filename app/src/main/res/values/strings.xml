@@ -18,4 +18,14 @@
     <string name="sign_up">Регистрация</string>
     <string name="title_label_editor">Название</string>
     <string name="skip">Пропустить</string>
+    <string name="control">Управление</string>
+    <string name="speed">Скорость</string>
+    <string name="color">Цвет</string>
+    <string name="size">Размер</string>
+    <string name="text">Текст</string>
+    <string name="background">Фон</string>
+    <string name="twenty_percent">20%</string>
+    <string name="one_hundred_percent">100%</string>
+    <string name="five_hundred_percent">500%</string>
+    <string name="connect">Подключить</string>
 </resources>

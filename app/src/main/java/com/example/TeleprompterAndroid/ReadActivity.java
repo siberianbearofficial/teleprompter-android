@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Html;
 import android.text.SpannableString;
@@ -46,19 +47,17 @@ import static com.example.TeleprompterAndroid.Consts.STATE_CONNECTED;
 import static com.example.TeleprompterAndroid.Consts.STATE_CONNECTING;
 import static com.example.TeleprompterAndroid.Consts.STATE_LISTEN;
 import static com.example.TeleprompterAndroid.Consts.STATE_NONE;
-import static com.example.TeleprompterAndroid.Consts.STOP_MODE;
+import static com.example.TeleprompterAndroid.Consts.PAUSE_MODE;
 
 public class ReadActivity extends AppCompatActivity {
 
     private TextView status;
-    private TextView output;
     private Button btnConnect;
     private Button btnLeaveChat;
-    private ScrollTextView scrollTextView;
+    private NewScrollTEXT scrollTextView;
     private LinearLayout container;
     private Dialog dialog;
     private BluetoothAdapter bluetoothAdapter;
-    private LinearLayout.LayoutParams layoutParams;
 
     private ArrayAdapter<String> discoveredDevicesAdapter;
     private BluetoothDevice connectingDevice;
@@ -70,6 +69,7 @@ public class ReadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_read);
 
         findViewsByIds();
+        setupScrollingTextView(Color.BLACK, 16);
 
         // Checks whether the device supports bluetooth or not
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -92,10 +92,10 @@ public class ReadActivity extends AppCompatActivity {
         btnLeaveChat.setOnClickListener(view -> chatLeave());
     }
 
-    private Handler handler = new Handler(new Handler.Callback() {
+    private Handler handler = new Handler(Looper.getMainLooper()) {
 
         @Override
-        public boolean handleMessage(Message msg) {
+        public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
@@ -110,61 +110,50 @@ public class ReadActivity extends AppCompatActivity {
                             btnConnect.setEnabled(false);
                             break;
                         case STATE_LISTEN:
+                            break;
                         case STATE_NONE:
                             setStatus("Not connected");
                             btnConnect.setEnabled(true);
                             btnConnect.setVisibility(View.VISIBLE);
                             btnLeaveChat.setVisibility(View.INVISIBLE);
-                            //output.setText("");
-                            showScrollingText("");
                             break;
                     }
                     break;
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
-
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    output.setText(readMessage);
                     break;
                 case CHANGE_SCRIPT:
-                    //byte[] buf = (byte[]) msg.obj;
-
-                    //String script = new String(buf, 0, msg.arg1);
-
                     String script = (String) msg.obj;
-
                     Log.e("READ_ACTIVITY", "CHANGE_SCRIPT: " + script);
-                    //output.setText(script);
-                    showScrollingText(script);
+                    scrollTextView.changeScript(script);
                     break;
                 case CHANGE_TEXT_SIZE:
                     byte[] buffer = (byte[]) msg.obj;
                     String bufferStr = new String(buffer);
                     int size = Integer.parseInt(bufferStr);
-                    output.setTextSize(size);
+                    scrollTextView.changeTextSize(size);
                     break;
                 case CHANGE_MIRRORING:
                     byte[] buffer2 = (byte[]) msg.obj;
                     String bufferStr2 = new String(buffer2, 0, msg.arg1);
                     boolean mirroring = bufferStr2.equals("true");
                     Log.d("ReadActivity", "CHANGE_MIRRORING: " + bufferStr2);
+                    scrollTextView.changeMirroring(mirroring);
                     break;
                 case CHANGE_SPEED:
                     byte[] buffer3 = (byte[]) msg.obj;
                     String bufferStr3 = new String(buffer3, 0, msg.arg1);
                     int speed = Integer.parseInt(bufferStr3);
                     Log.d("ReadActivity", "CHANGE_SPEED: " + bufferStr3);
+                    scrollTextView.changeSpeed(speed);
                     break;
                 case CHANGE_MODE:
                     //byte[] buffer4 = (byte[]) msg.obj;
                     //String bufferStr4 = new String(buffer4, 0, msg.arg1);
                     int mode = Integer.parseInt((String) msg.obj);
-                    if (mode == STOP_MODE) {
-                        scrollTextView.stopNestedScroll();
-                        container.updateViewLayout(scrollTextView, layoutParams); // TODO: Find a way to control scroll text view. Not tested yet.
-                        Log.e("ReadActivity", "Should be stopped!");
-                    }
-                    Log.d("ReadActivity", "CHANGE_MODE: " + mode);
+                    scrollTextView.changeMode(mode);
+                    Log.e("ReadActivity", "CHANGE_MODE: " + mode);
                     break;
                 case MESSAGE_DEVICE_OBJECT:
                     try {
@@ -180,9 +169,8 @@ public class ReadActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     break;
             }
-            return false;
         }
-    });
+    };
 
     private void setStatus(String s) {
         status.setText(s);
@@ -353,29 +341,16 @@ public class ReadActivity extends AppCompatActivity {
             readController.stop();
     }
 
-    private void showScrollingText (String text) {
-        scrollTextView = new ScrollTextView(getApplicationContext());
-
-        scrollTextView.setTextColor(Color.BLACK);
-        scrollTextView.setContinuousScrolling(false);
-        scrollTextView.setText(new SpannableString(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)));
-
-        float speed = 1;
-        int textSize = 16;
-        try {
-            speed = 2;
-            textSize = 20;
-        } catch (Exception e) {e.printStackTrace(); Toast.makeText(getApplicationContext(), R.string.wrong_data, Toast.LENGTH_LONG).show();}
-
-        scrollTextView.setSpeed(speed);
+    private void setupScrollingTextView (int color, int textSize) {
+        scrollTextView = new NewScrollTEXT(getApplicationContext());
+        scrollTextView.setTextColor(color);
         scrollTextView.setTextSize(textSize);
         scrollTextView.setTypeface(ResourcesCompat.getFont(getApplicationContext(), R.font.test_font));
 
-        layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         container.setPadding(30, 0, 30, 20);
         scrollTextView.setLayoutParams(layoutParams);
         container.removeAllViews();
         container.addView(scrollTextView);
-
     }
 }

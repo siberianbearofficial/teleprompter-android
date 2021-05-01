@@ -1,18 +1,28 @@
 package com.example.TeleprompterAndroid;
 
 import android.content.Context;
+import android.icu.util.Measure;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Html;
+import android.text.SpannableString;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.bumptech.glide.load.model.stream.HttpGlideUrlLoader;
-import com.google.android.material.progressindicator.BaseProgressIndicator;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_MIRRORING;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_MODE;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SPEED;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_TEXT_SIZE;
+import static com.example.TeleprompterAndroid.Consts.PAUSE_MODE;
+import static com.example.TeleprompterAndroid.Consts.PLAY_MODE;
+import static com.example.TeleprompterAndroid.Consts.STOP_MODE;
 
 
 public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView implements Runnable {
@@ -24,7 +34,7 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
     private float speed = DEFAULT_SPEED;
     private boolean continuousScrolling = true;
 
-    public Handler handler;
+    private Handler handler, fandler;
 
 
     //constructors
@@ -50,31 +60,136 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
             handler = new Handler(Looper.getMainLooper()) {
                 @Override
                 public void handleMessage(@NonNull Message msg) {
-                    //tv.setText("Прошло операций: "+msg.what);
-                    setTextSize((int) msg.obj);
+                    switch ((int) msg.arg1) {
+                        case CHANGE_SCRIPT:
+                            String script = (String) msg.obj;
+                            setText(new SpannableString(Html.fromHtml(script, Html.FROM_HTML_MODE_LEGACY)));
+                            break;
+                        case CHANGE_TEXT_SIZE:
+                            int textSize = (int) msg.obj;
+                            setTextSize(textSize);
+                            break;
+                        case CHANGE_SPEED:
+                            int speed = (int) msg.obj;
+                            setSpeed(speed);
+                            break;
+                        case CHANGE_MIRRORING:
+                            boolean mirroring = (boolean) msg.obj;
+                            if (mirroring) mirrorTextOn(); else mirrorTextOff();
+                            break;
+                        case CHANGE_MODE:
+                            int mode = (int) msg.obj;
+                            switch (mode) {
+                                case PAUSE_MODE:
+                                    Log.e("SCROLLING_TEXT_VIEW_CLASS", "Should be stopped!");
+                                    //stopNestedScroll();
+                                    Message message = new Message();
+                                    message.obj = true;
+                                    fandler.sendMessage(message);
+                                    break;
+                                case PLAY_MODE:
+                                    Log.e("SCROLLING_TEXT_VIEW_CLASS", "Should be played!");
+                                    //stopNestedScroll();
+                                    Message message2 = new Message();
+                                    message2.obj = false;
+                                    fandler.sendMessage(message2);
+                                    break;
+                                case STOP_MODE:
+                                    scroller.abortAnimation();
+                                    break;
+                                default:
+                                    Toast.makeText(getContext(), "Change mode: " + mode, Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                            break;
+                        default:
+                            Toast.makeText(getContext(), (int) msg.arg1, Toast.LENGTH_LONG).show();
+                            break;
+                    }
                 }
             };
             scroll();
         }
     }
 
-    public void changeHandlerMessage (int ts) {
+    public void changeScript (String script) {
         Message msg = new Message();
-        msg.obj = ts;
+        msg.obj = script;
+        msg.arg1 = CHANGE_SCRIPT;
         handler.sendMessage(msg);
     }
 
+    public void changeTextSize (int textSize) {
+        Message msg = new Message();
+        msg.obj = textSize;
+        msg.arg1 = CHANGE_TEXT_SIZE;
+        handler.sendMessage(msg);
+    }
+
+    public void changeMirroring (boolean mirroring) {
+        Message msg = new Message();
+        msg.obj = mirroring;
+        msg.arg1 = CHANGE_MIRRORING;
+        handler.sendMessage(msg);
+    }
+
+    public void changeSpeed (int speed) {
+        Message msg = new Message();
+        msg.obj = speed;
+        msg.arg1 = CHANGE_SPEED;
+        handler.sendMessage(msg);
+    }
+
+    public void changeMode (int mode) {
+        Message msg = new Message();
+        msg.obj = mode;
+        msg.arg1 = CHANGE_MODE;
+        handler.sendMessage(msg);
+    }
+
+    private boolean pause;
+    private boolean pauseFlag = false;
+    private int pauseY;
+
     //start Scrolling method
     private void scroll() {
-        int viewHeight = getHeight();
-        int visibleHeight = viewHeight - getPaddingBottom() - getPaddingTop();
-        int lineHeight = getLineHeight();
+        fandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                pause = (boolean) msg.obj;
+                // scroller.forceFinished(true);
+                pauseY = scroller.getCurrY();
+                scroller.abortAnimation();
+                // scroller.startScroll(pauseX, pauseOffset, 0, 0, 1);
+                Log.e("SCROLLING_TEXT_VIEW_CLASS", "In run method, stopped!");
+            }
+        };
 
-        int offset = -1 * visibleHeight;
-        int distance = visibleHeight + getLineCount() * lineHeight;
-        int duration = (int) (distance * speed);
+        int viewHeight, visibleHeight, lineHeight, offset = 0, distance = 0, duration = 0;
+        if (!pause) {
+            viewHeight = getHeight();
+            visibleHeight = viewHeight - getPaddingBottom() - getPaddingTop();
+            lineHeight = getLineHeight();
 
-        scroller.startScroll(0, offset, 0, distance, duration);
+            offset = -1 * visibleHeight;
+            distance = visibleHeight + getLineCount() * lineHeight;
+
+            duration = (int) (distance * speed);
+        }
+
+        if (pause) {
+            if (!pauseFlag) {
+                pauseFlag = true;
+            }
+        }
+
+        if (!pause) {
+            if (pauseFlag) {
+                scroller.startScroll(0, pauseY, 0, distance, ((int) (distance * speed)));
+                pauseFlag = false;
+            } else scroller.startScroll(0, offset, 0, distance, duration);
+        }
+        else scroller.startScroll(0, pauseY, 0, 0, 10);
 
         if (continuousScrolling) {
             post(this);
@@ -113,7 +228,7 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
 
 
     ///mirror tex
-    public void mirrorTextOnn() {
+    public void mirrorTextOn() {
         setScaleX(-1);
         setScaleY(1);
     }

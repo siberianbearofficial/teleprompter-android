@@ -179,16 +179,13 @@ public class MainActivity extends AppCompatActivity {
                 FileInputStream inputStream = new FileInputStream(file);
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
                 String str = "";
-                boolean flag = false;
                 while ((str = br.readLine()) != null) {
-                    if (str.contains("<html")) flag = true;
-                    if (!flag) str += "<br>";
                     text.append(str);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println(text);
+            System.out.println(text.toString());
         }
         return text.toString();
     }
