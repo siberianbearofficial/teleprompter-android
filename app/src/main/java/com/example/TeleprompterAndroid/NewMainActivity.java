@@ -62,6 +62,6 @@ public class NewMainActivity extends AppCompatActivity {
     }*/
 
     public void BluetoothWriteMode(View v) {
-        startActivity(new Intent(getApplicationContext(), WriteActivity.class));
+        startActivity(new Intent(getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", "Test script"));
     }
 }

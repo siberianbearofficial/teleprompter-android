@@ -8,12 +8,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.SpannableString;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import java.util.Set;
 
@@ -44,9 +47,7 @@ import static com.example.TeleprompterAndroid.Consts.STOP_MODE;
 public class WriteActivity extends AppCompatActivity {
 
     private TextView status;
-    private EditText inputWrite;
-    private Button btnConnect;
-    private Button btnLeaveChat;
+    private View btnConnectView;
     private Dialog dialog;
     private BluetoothAdapter bluetoothAdapter;
 
@@ -58,14 +59,16 @@ public class WriteActivity extends AppCompatActivity {
     private boolean paused = false;
     private boolean connect = true;
 
-    private String script;
+    private String script = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_write);
+        setContentView(R.layout.activity_write_2);
 
         findViewsByIds();
+        script = getIntent().getStringExtra("SCRIPT");
+        Log.d("WRITE_ACTIVITY: ", "Script: " + script);
 
         // Checks whether the device supports bluetooth or not
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -79,13 +82,6 @@ public class WriteActivity extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, BLUETOOTH_SOLICITATION);
         }
-
-        // Displays dialog with list of devices
-        //btnConnect.setOnClickListener(view -> showDevicesDialog());
-
-        // will fechat current chat
-        //btnLeaveChat.setVisibility(View.INVISIBLE);
-        //btnLeaveChat.setOnClickListener(view -> chatLeave());
     }
 
     private Handler handler = new Handler(Looper.getMainLooper()) {
@@ -96,22 +92,23 @@ public class WriteActivity extends AppCompatActivity {
                 case MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case STATE_CONNECTED:
-                            setStatus("Connected to:" + connectingDevice.getName());
-                            changeScript(script);
-                            //btnConnect.setEnabled(false);
-                            //btnConnect.setVisibility(View.INVISIBLE);
-                            //btnLeaveChat.setVisibility(View.VISIBLE);
+                            String name = connectingDevice.getName();
+                            int maxLength = status.getText().toString().length();
+                            if (name.length() > maxLength) {
+                                name = name.substring(0, maxLength);
+                            }
+
+                            setStatus(name);
+                            btnConnectView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.rectangle_9));
+                            //changeScript(script);
                             break;
                         case STATE_CONNECTING:
-                            setStatus("Connecting...");
-                            //btnConnect.setEnabled(false);
+                            setStatus("Подключение...");
                             break;
                         case STATE_LISTEN:
                         case STATE_NONE:
-                            //setStatus("Not connected");
-                            //btnConnect.setEnabled(true);
-                            //btnConnect.setVisibility(View.VISIBLE);
-                            //btnLeaveChat.setVisibility(View.INVISIBLE);
+                            setStatus(getString(R.string.connect));
+                            btnConnectView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.rectangle_8));
                             break;
                     }
                     break;
@@ -133,11 +130,11 @@ public class WriteActivity extends AppCompatActivity {
     }
 
     public void chatLeave(){
-        //btnLeaveChat.setVisibility(View.INVISIBLE);
         if (writeController != null)
             writeController.stop();
-        //btnConnect.setVisibility(View.VISIBLE);
 
+        btnConnectView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.rectangle_8));
+        setStatus(getString(R.string.connect));
     }
 
     private void showDevicesDialog() {
@@ -242,20 +239,10 @@ public class WriteActivity extends AppCompatActivity {
     }
 
     private void findViewsByIds() {
-        //status = findViewById(R.id.status_write);
         status = findViewById(R.id.status_write2);
-        //btnConnect = findViewById(R.id.btn_connect_write);
-        //btnLeaveChat = findViewById(R.id.btn_sair_write);
-        //inputWrite = findViewById(R.id.input_write);
-        //View btnSend = findViewById(R.id.btn_send_write);
-        //View btnStop = findViewById(R.id.btn_stop_write);
+        btnConnectView = findViewById(R.id.btnConnectView);
 
-        //btnStop.setOnClickListener(v -> changeMode(PAUSE_MODE));
-
-        /*btnSend.setOnClickListener(view -> {
-            changeScript(inputWrite.getText().toString());
-            inputWrite.setText("");
-        });*/
+        btnConnectView.setOnClickListener(v -> Connect());
     }
 
     public void Stop (View view) {
@@ -272,7 +259,7 @@ public class WriteActivity extends AppCompatActivity {
         changeMirroring(mirroring);
     }
 
-    public void Connect (View view) {
+    private void Connect () {
         if (connect) showDevicesDialog(); else chatLeave();
         connect = !connect;
     }

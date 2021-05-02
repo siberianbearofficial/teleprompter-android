@@ -274,7 +274,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/view3"
+        android:id="@+id/btnConnectView"
         android:layout_width="272dp"
         android:layout_height="69dp"
         android:layout_marginBottom="30dp"
@@ -282,7 +282,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        android:onClick="Connect"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -292,8 +291,8 @@
         android:fontFamily="@font/montserrat_alternates_bold"
         android:text="@string/connect"
         android:textAppearance="@style/connect"
-        app:layout_constraintBottom_toBottomOf="@+id/view3"
-        app:layout_constraintEnd_toEndOf="@+id/view3"
-        app:layout_constraintStart_toStartOf="@+id/view3"
-        app:layout_constraintTop_toTopOf="@+id/view3" />
+        app:layout_constraintBottom_toBottomOf="@+id/btnConnectView"
+        app:layout_constraintEnd_toEndOf="@+id/btnConnectView"
+        app:layout_constraintStart_toStartOf="@+id/btnConnectView"
+        app:layout_constraintTop_toTopOf="@+id/btnConnectView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

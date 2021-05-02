@@ -135,10 +135,9 @@ public class ReadActivity extends AppCompatActivity {
                     scrollTextView.changeTextSize(size);
                     break;
                 case CHANGE_MIRRORING:
-                    byte[] buffer2 = (byte[]) msg.obj;
-                    String bufferStr2 = new String(buffer2, 0, msg.arg1);
-                    boolean mirroring = bufferStr2.equals("true");
-                    Log.d("ReadActivity", "CHANGE_MIRRORING: " + bufferStr2);
+                    String mirroringString = (String) msg.obj;
+                    boolean mirroring = mirroringString.equals("true");
+                    Log.d("ReadActivity", "CHANGE_MIRRORING: " + mirroringString);
                     scrollTextView.changeMirroring(mirroring);
                     break;
                 case CHANGE_SPEED:
