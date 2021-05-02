@@ -108,6 +108,7 @@
                 android:textAppearance="@style/speed" />
 
             <SeekBar
+                android:id="@+id/speed_seekbar_control"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="-12dp"
@@ -250,6 +251,7 @@
                     android:paddingTop="10dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="10dp"
+                    android:onClick="ReduceTextSize"
                     android:src="@drawable/left_arrow_control" />
 
                 <TextView
@@ -257,7 +259,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:fontFamily="@font/montserrat_alternates_light"
-
+                    android:id="@+id/size_textfield"
                     android:text="48"
                     android:textAppearance="@style/size_control" />
 
@@ -268,6 +270,7 @@
                     android:paddingStart="10dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
+                    android:onClick="IncreaseTextSize"
                     android:src="@drawable/right_arrow_control" />
             </LinearLayout>
         </LinearLayout>

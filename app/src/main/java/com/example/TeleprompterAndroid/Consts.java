@@ -13,6 +13,7 @@ public class Consts {
     public static final int CHANGE_MIRRORING = 6;
     public static final int CHANGE_TEXT_SIZE = 7;
     public static final int CHANGE_MODE = 8;
+    public static final int CHANGE_ALL = 18;
 
     public static final int MESSAGE_STATE_CHANGE = 9;
     public static final int MESSAGE_READ = 10;

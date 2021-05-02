@@ -33,6 +33,7 @@ import com.gamadevelopment.scrolltextview.ScrollTextView;
 import java.util.Set;
 
 import static com.example.TeleprompterAndroid.Consts.BLUETOOTH_SOLICITATION;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_ALL;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_MIRRORING;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_MODE;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT;
@@ -120,8 +121,10 @@ public class ReadActivity extends AppCompatActivity {
                     }
                     break;
                 case MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
-                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    try {
+                        byte[] readBuf = (byte[]) msg.obj;
+                        String readMessage = new String(readBuf, 0, msg.arg1);
+                    } catch (Exception ignored) {}
                     break;
                 case CHANGE_SCRIPT:
                     String script = (String) msg.obj;
@@ -129,10 +132,10 @@ public class ReadActivity extends AppCompatActivity {
                     scrollTextView.changeScript(script);
                     break;
                 case CHANGE_TEXT_SIZE:
-                    byte[] buffer = (byte[]) msg.obj;
-                    String bufferStr = new String(buffer);
-                    int size = Integer.parseInt(bufferStr);
+                    String textSizeString = (String) msg.obj;
+                    int size = Integer.parseInt(textSizeString);
                     scrollTextView.changeTextSize(size);
+                    Log.e("READ_ACTIVITY", "CHANGE_TEXT_SIZE: " + textSizeString);
                     break;
                 case CHANGE_MIRRORING:
                     String mirroringString = (String) msg.obj;
@@ -141,18 +144,22 @@ public class ReadActivity extends AppCompatActivity {
                     scrollTextView.changeMirroring(mirroring);
                     break;
                 case CHANGE_SPEED:
-                    byte[] buffer3 = (byte[]) msg.obj;
-                    String bufferStr3 = new String(buffer3, 0, msg.arg1);
-                    int speed = Integer.parseInt(bufferStr3);
-                    Log.d("ReadActivity", "CHANGE_SPEED: " + bufferStr3);
+                    String speedString = (String) msg.obj;
+                    int speed = Integer.parseInt(speedString);
+                    Log.d("ReadActivity", "CHANGE_SPEED: " + speedString);
                     scrollTextView.changeSpeed(speed);
                     break;
                 case CHANGE_MODE:
-                    //byte[] buffer4 = (byte[]) msg.obj;
-                    //String bufferStr4 = new String(buffer4, 0, msg.arg1);
                     int mode = Integer.parseInt((String) msg.obj);
                     scrollTextView.changeMode(mode);
                     Log.e("ReadActivity", "CHANGE_MODE: " + mode);
+                    break;
+                case CHANGE_ALL:
+                    String gotString = (String) msg.obj;
+                    String[] parts = gotString.split("_");
+                    int textsize2 = Integer.parseInt(parts[0]); int speed2 = Integer.parseInt(parts[1]); String script2 = parts[2]; boolean mirroring2 = parts[2].equals("true");
+                    scrollTextView.changeTextSize(textsize2); scrollTextView.changeSpeed(speed2); scrollTextView.changeScript(script2); scrollTextView.changeMirroring(mirroring2);
+                    Log.e("CHANGE_ACTIVITY", "CHANGE_ALL: textSize - " + textsize2 + ", speed - " + speed2 + ", script - " + script2 + ", mirroring - " + (mirroring2 ? "true" : "false"));
                     break;
                 case MESSAGE_DEVICE_OBJECT:
                     try {

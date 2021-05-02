@@ -21,11 +21,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import org.w3c.dom.Text;
 
 import java.util.Set;
 
@@ -47,7 +50,9 @@ import static com.example.TeleprompterAndroid.Consts.STOP_MODE;
 public class WriteActivity extends AppCompatActivity {
 
     private TextView status;
+    private TextView textsizeView;
     private View btnConnectView;
+    private SeekBar speedView;
     private Dialog dialog;
     private BluetoothAdapter bluetoothAdapter;
 
@@ -58,8 +63,9 @@ public class WriteActivity extends AppCompatActivity {
     private boolean mirroring = false;
     private boolean paused = false;
     private boolean connect = true;
-
+    private int speed = 1;
     private String script = "";
+    private int textsize = 16;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +73,14 @@ public class WriteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_write_2);
 
         findViewsByIds();
-        script = getIntent().getStringExtra("SCRIPT");
-        Log.d("WRITE_ACTIVITY: ", "Script: " + script);
+
+        Intent intent = getIntent();
+        script = intent.getStringExtra("SCRIPT");
+        textsize = Integer.parseInt(intent.getStringExtra("TEXTSIZE"));
+        speed = Integer.parseInt(intent.getStringExtra("SPEED"));
+        textsizeView.setText(Integer.toString(textsize));
+        speedView.setProgress(toPercentValue(speed));
+        Log.d("WRITE_ACTIVITY: ", "Script: " + script + ", Speed: " + toPercentValue(speed));
 
         // Checks whether the device supports bluetooth or not
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -115,7 +127,7 @@ public class WriteActivity extends AppCompatActivity {
                 case MESSAGE_DEVICE_OBJECT:
                     connectingDevice = msg.getData().getParcelable(DEVICE_OBJECT);
                     Toast.makeText(getApplicationContext(), "Connected to " + connectingDevice.getName(), Toast.LENGTH_SHORT).show();
-                    changeScript(script);
+                    changeAll(textsize, speed, script, mirroring);
                     break;
                 case MESSAGE_TOAST:
                     Toast.makeText(getApplicationContext(), msg.getData().getString("toast"),
@@ -241,8 +253,35 @@ public class WriteActivity extends AppCompatActivity {
     private void findViewsByIds() {
         status = findViewById(R.id.status_write2);
         btnConnectView = findViewById(R.id.btnConnectView);
+        textsizeView = findViewById(R.id.size_textfield);
+        speedView = findViewById(R.id.speed_seekbar_control);
 
         btnConnectView.setOnClickListener(v -> Connect());
+        speedView.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int speedGot = seekBar.getProgress();
+                Log.d("SEEK_BAR", "Speed got: " + Integer.toString(speedGot));
+                // от 1 до 50, было от 0 до 100; делаем сначала от 0 до 49, потом от 1 до 50
+                speedGot = toSpeedValue(speedGot);
+                Log.d("SEEK_BAR", "Speed ready: " + speedGot);
+                changeSpeed(speedGot);
+            }
+        });
+    }
+
+    private int toSpeedValue (int speedGot) {
+        return (int) (((100 - speedGot) / 100f) * 49 + 1);
+    }
+
+    private int toPercentValue (int speedGot) {
+        return 100 - ((int) ((speedGot - 1) / 49f * 100));
     }
 
     public void Stop (View view) {
@@ -252,6 +291,18 @@ public class WriteActivity extends AppCompatActivity {
     public void Pause (View view) {
         paused = !paused;
         changeMode((!paused) ? PAUSE_MODE : PLAY_MODE);
+    }
+
+    public void IncreaseTextSize (View view) {
+        textsize++;
+        textsizeView.setText(Integer.toString(textsize));
+        changeTextSize(textsize);
+    }
+
+    public void ReduceTextSize (View view) {
+        textsize--;
+        textsizeView.setText(Integer.toString(textsize));
+        changeTextSize(textsize);
     }
 
     public void Mirror (View view) {
@@ -315,6 +366,17 @@ public class WriteActivity extends AppCompatActivity {
         }
 
         writeController.changeMirroring(mirroring);
+    }
+
+    private void changeAll (int textSize, int speed, String script, boolean mirroring) {
+        if (writeController.getStatus() != STATE_CONNECTED) {
+            Toast.makeText(this, "No connection!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if ((speed > 0) && (textSize > 0) && (script.length() > 0)) {
+            writeController.changeAll(textSize, speed, script, mirroring);
+        }
     }
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {

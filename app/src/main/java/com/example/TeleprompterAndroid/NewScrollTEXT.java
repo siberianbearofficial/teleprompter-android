@@ -71,7 +71,22 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
                             break;
                         case CHANGE_SPEED:
                             int speed = (int) msg.obj;
+                            Message message3 = new Message();
+                            message3.what = PAUSE_MODE;
+                            message3.obj = true;
+                            fandler.sendMessage(message3);
                             setSpeed(speed);
+                            new Thread(() -> {
+                                try {
+                                    Thread.sleep(10);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                Message message4 = new Message();
+                                message4.what = PAUSE_MODE;
+                                message4.obj = false;
+                                fandler.sendMessage(message4);
+                            }).start();
                             break;
                         case CHANGE_MIRRORING:
                             boolean mirroring = (boolean) msg.obj;
@@ -82,16 +97,16 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
                             switch (mode) {
                                 case PAUSE_MODE:
                                     Log.e("SCROLLING_TEXT_VIEW_CLASS", "Should be stopped!");
-                                    //stopNestedScroll();
                                     Message message = new Message();
                                     message.obj = true;
+                                    message.what = PAUSE_MODE;
                                     fandler.sendMessage(message);
                                     break;
                                 case PLAY_MODE:
                                     Log.e("SCROLLING_TEXT_VIEW_CLASS", "Should be played!");
-                                    //stopNestedScroll();
                                     Message message2 = new Message();
                                     message2.obj = false;
+                                    message2.what = PAUSE_MODE;
                                     fandler.sendMessage(message2);
                                     break;
                                 case STOP_MODE:
@@ -156,12 +171,13 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
         fandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
-                pause = (boolean) msg.obj;
-                // scroller.forceFinished(true);
-                pauseY = scroller.getCurrY();
-                scroller.abortAnimation();
-                // scroller.startScroll(pauseX, pauseOffset, 0, 0, 1);
-                Log.e("SCROLLING_TEXT_VIEW_CLASS", "In run method, stopped!");
+                if (msg.what == PAUSE_MODE) {
+                    pause = (boolean) msg.obj;
+                    // scroller.forceFinished(true);
+                    pauseY = scroller.getCurrY();
+                    scroller.abortAnimation();
+                    // scroller.startScroll(pauseX, pauseOffset, 0, 0, 1);
+                }
             }
         };
 

@@ -20,10 +20,14 @@ import okhttp3.Response;
 
 public class NewMainActivity extends AppCompatActivity {
 
+    private int textsize;
+    private int speed;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_main);
+        textsize = 48;
+        speed = 30;
     }
 
     private void getAllArticles () throws IOException {
@@ -62,6 +66,6 @@ public class NewMainActivity extends AppCompatActivity {
     }*/
 
     public void BluetoothWriteMode(View v) {
-        startActivity(new Intent(getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", "Test script"));
+        startActivity(new Intent(getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", "Test script").putExtra("TEXTSIZE", Integer.toString(textsize)).putExtra("SPEED", Integer.toString(speed)));
     }
 }

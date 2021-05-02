@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import static com.example.TeleprompterAndroid.Consts.APP_NAME;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_ALL;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_MIRRORING;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_MODE;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT;
@@ -147,6 +148,16 @@ public class WriteController {
             serverThread = null;
         }
         setStatus(STATE_NONE);
+    }
+
+    public void changeAll (int textSize, int speed, String script, boolean mirroring) {
+        WriteThread writeThread;
+        synchronized (this) {
+            if (status != STATE_CONNECTED) return;
+            writeThread = this.writeThread;
+        }
+        String toSend = CHANGE_ALL + SYSTEM_REGEX + textSize + "_" + speed + "_" + script + "_" + (mirroring ? "true" : "false");
+        writeThread.send(toSend.getBytes());
     }
 
     public void changeMirroring (boolean mirroring) {
