@@ -12,12 +12,17 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.example.TeleprompterAndroid.Consts.APP_NAME;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_ALL;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_MIRRORING;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_MODE;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT_END;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT_MIDDLE;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT_START;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_SPEED;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_TEXT_SIZE;
 import static com.example.TeleprompterAndroid.Consts.DEVICE_OBJECT;
@@ -203,8 +208,35 @@ public class WriteController {
             if (status != STATE_CONNECTED) return;
             writeThread = this.writeThread;
         }
-        String toSend = CHANGE_SCRIPT + SYSTEM_REGEX + script;
-        writeThread.send(toSend.getBytes());
+        if (script.length() > 500) {
+            ArrayList<String> arrayList = new ArrayList<>();
+            String[] parts = splitByNumber(script, 500);
+            for (int i = 0; i < parts.length; i++) {
+                parts[i] = CHANGE_SCRIPT_MIDDLE + SYSTEM_REGEX + parts[i];
+            }
+            new Thread(() -> {
+                writeThread.send((CHANGE_SCRIPT_START + SYSTEM_REGEX + "ok").getBytes());
+                for (String string : parts) {
+                    try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+                    writeThread.send(string.getBytes());
+                }
+                try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+                writeThread.send((CHANGE_SCRIPT_END + SYSTEM_REGEX + "ok").getBytes());
+            }).start();
+        } else {
+            String toSend = CHANGE_SCRIPT + SYSTEM_REGEX + script;
+            writeThread.send(toSend.getBytes());
+        }
+    }
+
+    private static String[] splitByNumber(String s, int size) {
+        if(s == null || size <= 0)
+            return null;
+        int chunks = s.length() / size + ((s.length() % size > 0) ? 1 : 0);
+        String[] arr = new String[chunks];
+        for(int i = 0, j = 0, l = s.length(); i < l; i += size, j++)
+            arr[j] = s.substring(i, Math.min(l, i + size));
+        return arr;
     }
 
     private void connectionFailed() {
@@ -338,6 +370,8 @@ public class WriteController {
     private class WriteThread {
         private final BluetoothSocket bluetoothSocket;
         private final OutputStream outputStream;
+
+        private StringBuilder stringBuilder = new StringBuilder("");
 
         public WriteThread(BluetoothSocket socket) {
             this.bluetoothSocket = socket;

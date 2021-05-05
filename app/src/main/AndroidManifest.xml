@@ -31,7 +31,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".EditorActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".EditorActivityBluetoothDevice" />
+        <activity android:name=".MainActivity">
+
+        </activity>
     </application>
 
 </manifest>

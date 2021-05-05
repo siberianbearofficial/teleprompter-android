@@ -107,7 +107,7 @@ public class WriteActivity extends AppCompatActivity {
                             String name = connectingDevice.getName();
                             int maxLength = status.getText().toString().length();
                             if (name.length() > maxLength) {
-                                name = name.substring(0, maxLength);
+                                name = name.substring(0, maxLength - 3) + "...";
                             }
 
                             setStatus(name);
@@ -262,7 +262,7 @@ public class WriteActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {changeMode(PAUSE_MODE);}
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -290,7 +290,7 @@ public class WriteActivity extends AppCompatActivity {
 
     public void Pause (View view) {
         paused = !paused;
-        changeMode((!paused) ? PAUSE_MODE : PLAY_MODE);
+        changeMode((paused) ? PAUSE_MODE : PLAY_MODE);
     }
 
     public void IncreaseTextSize (View view) {
@@ -357,6 +357,15 @@ public class WriteActivity extends AppCompatActivity {
         if (speed > 0) {
             writeController.changeSpeed(speed);
         }
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            changeMode(PLAY_MODE);
+        }).start();
     }
 
     private void changeMirroring (boolean mirroring) {
@@ -375,7 +384,19 @@ public class WriteActivity extends AppCompatActivity {
         }
 
         if ((speed > 0) && (textSize > 0) && (script.length() > 0)) {
-            writeController.changeAll(textSize, speed, script, mirroring);
+            if (script.length() <= 500) {
+                writeController.changeAll(textSize, speed, script, mirroring);
+                return;
+            }
+            writeController.changeAll(textSize, speed, "some", mirroring);
+            new Thread(() -> {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                writeController.changeScript(script);
+            }).start();
         }
     }
 

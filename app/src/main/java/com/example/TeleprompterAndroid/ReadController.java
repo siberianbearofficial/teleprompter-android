@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static com.example.TeleprompterAndroid.Consts.APP_NAME;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT_END;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT_MIDDLE;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT_START;
 import static com.example.TeleprompterAndroid.Consts.DEVICE_OBJECT;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_DEVICE_OBJECT;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_STATE_CHANGE;
@@ -288,6 +292,8 @@ public class ReadController {
             byte[] buffer = new byte[1024];
             int bytes;
 
+            StringBuilder stringBuilder = new StringBuilder("");
+
             // always keep looking at the entrance
             while (true) {
                 try {
@@ -296,11 +302,13 @@ public class ReadController {
                     String got = new String(buffer, 0, bytes);
                     String[] parts = got.split(SYSTEM_REGEX);
 
+                    int code = Integer.parseInt(parts[0]);
+                    if (code == CHANGE_SCRIPT_START) stringBuilder = new StringBuilder(""); else if (code == CHANGE_SCRIPT_END) handler.obtainMessage(CHANGE_SCRIPT, bytes, -1, stringBuilder.toString()).sendToTarget(); else
+                        if (code == CHANGE_SCRIPT_MIDDLE) stringBuilder.append(parts[1]); else {handler.obtainMessage(Integer.parseInt(parts[0]), bytes, -1, parts[1]).sendToTarget();}
+
                     // sends the input to be displayed in the user interface
                     Log.e("READ_CONTROLLER", "Bytes: " + bytes);
                     Log.e("READ_CONTROLLER", "Row data: " + got);
-
-                    handler.obtainMessage(Integer.parseInt(parts[0]), bytes, -1, parts[1]).sendToTarget();
                 } catch (IOException e) {
                     connectionLost();
                     // If something goes wrong restart the chat

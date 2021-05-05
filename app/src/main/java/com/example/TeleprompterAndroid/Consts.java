@@ -10,6 +10,9 @@ public class Consts {
 
     public static final int CHANGE_SPEED = 4;
     public static final int CHANGE_SCRIPT = 5;
+    public static final int CHANGE_SCRIPT_MIDDLE = 19;
+    public static final int CHANGE_SCRIPT_START = 20;
+    public static final int CHANGE_SCRIPT_END = 21;
     public static final int CHANGE_MIRRORING = 6;
     public static final int CHANGE_TEXT_SIZE = 7;
     public static final int CHANGE_MODE = 8;
@@ -30,6 +33,14 @@ public class Consts {
     public static final String DEVICE_OBJECT = "device_name";
     public static final String SYSTEM_REGEX = "_015CodeSYSregex37_";
     public static final String APP_NAME = "BluetoothChat";
+    public static final String FILE_NAME = "FileName";
+    public static final String FILE_DATE = "FileDate";
+    public static final String FILE_STAR = "FileStar";
+    public static final String FILE_TEXT_SIZE = "FileTextSize";
+    public static final String FILE_SPEED = "FileSpeed";
+    public static final String FILE_SCRIPT = "FileScript";
+
+    public static final int PICK_HTML_FILE = 2;
 
     public static final UUID MY_UUID = UUID.fromString("85293a76-ff18-4797-b07c-987201c2285e");
 

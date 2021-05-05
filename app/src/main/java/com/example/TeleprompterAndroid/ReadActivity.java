@@ -44,6 +44,7 @@ import static com.example.TeleprompterAndroid.Consts.MESSAGE_DEVICE_OBJECT;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_READ;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_STATE_CHANGE;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_TOAST;
+import static com.example.TeleprompterAndroid.Consts.PLAY_MODE;
 import static com.example.TeleprompterAndroid.Consts.STATE_CONNECTED;
 import static com.example.TeleprompterAndroid.Consts.STATE_CONNECTING;
 import static com.example.TeleprompterAndroid.Consts.STATE_LISTEN;
@@ -158,8 +159,8 @@ public class ReadActivity extends AppCompatActivity {
                     String gotString = (String) msg.obj;
                     String[] parts = gotString.split("_");
                     int textsize2 = Integer.parseInt(parts[0]); int speed2 = Integer.parseInt(parts[1]); String script2 = parts[2]; boolean mirroring2 = parts[2].equals("true");
-                    scrollTextView.changeTextSize(textsize2); scrollTextView.changeSpeed(speed2); scrollTextView.changeScript(script2); scrollTextView.changeMirroring(mirroring2);
-                    Log.e("CHANGE_ACTIVITY", "CHANGE_ALL: textSize - " + textsize2 + ", speed - " + speed2 + ", script - " + script2 + ", mirroring - " + (mirroring2 ? "true" : "false"));
+                    scrollTextView.changeTextSize(textsize2); scrollTextView.changeScript(script2); scrollTextView.changeMirroring(mirroring2); scrollTextView.changeSpeed(speed2);
+                    Log.e("ReadActivity", "CHANGE_ALL: textSize - " + textsize2 + ", speed - " + speed2 + ", script - " + script2 + ", mirroring - " + (mirroring2 ? "true" : "false"));
                     break;
                 case MESSAGE_DEVICE_OBJECT:
                     try {
@@ -349,6 +350,7 @@ public class ReadActivity extends AppCompatActivity {
 
     private void setupScrollingTextView (int color, int textSize) {
         scrollTextView = new NewScrollTEXT(getApplicationContext());
+        scrollTextView.setText("");
         scrollTextView.setTextColor(color);
         scrollTextView.setTextSize(textSize);
         scrollTextView.setTypeface(ResourcesCompat.getFont(getApplicationContext(), R.font.test_font));

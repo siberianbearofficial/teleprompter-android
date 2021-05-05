@@ -5,21 +5,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.Html;
 import android.text.SpannableString;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -28,18 +25,17 @@ import android.widget.Toast;
 import com.gamadevelopment.scrolltextview.ScrollTextView;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static com.example.TeleprompterAndroid.Consts.FILE_NAME;
+import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
+import static com.example.TeleprompterAndroid.Consts.PICK_HTML_FILE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private ScrollTextView scrollTextView;
     private LinearLayout container;
     private Handler h, f;
+
+    private int textSize;
+    private int speed;
 
     public static final String url = "https://teleprompter-android-server.siberianbear.repl.co/";
 
@@ -65,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
         fileButton = findViewById(R.id.buttonFile);
         //editorButton = findViewById(R.id.editorButton);
 
+        speed = 1;
+        textSize = 48;
+
         h = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -75,7 +77,14 @@ public class MainActivity extends AppCompatActivity {
         f = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
-                showScrollingText(msg.obj.toString());
+                Bundle bundle = (Bundle) msg.obj;
+                String fileName = bundle.getString(FILE_NAME);
+                String fileScript = bundle.getString(FILE_SCRIPT);
+                if (fileName.equals(getString(R.string.no_file))) {
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_file), Toast.LENGTH_SHORT).show(); return;
+                }
+                Log.d("MainActivity", "File name: " + fileName);
+                startActivity(new Intent(getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", fileScript).putExtra("TEXTSIZE", Integer.toString(textSize)).putExtra("SPEED", Integer.toString(speed)));
             }
         };
 
@@ -98,7 +107,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fileButton.setOnClickListener(v -> {
-            chooseFile();
+//            chooseFile();
+            openFile();
         });
 
 //        editorButton.setOnClickListener(v -> {
@@ -124,7 +134,17 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    private void openFile() {
+        if (isStoragePermissionGranted()) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("text/*");
+
+            startActivityForResult(intent, PICK_HTML_FILE);
+        }
+    }
+
+    /*protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -139,23 +159,87 @@ public class MainActivity extends AppCompatActivity {
                         String filePath = chosenFileUri.getPath();
                         filePath = filePath.split(":")[1];
                         System.out.println(filePath);
-                        Message m = Message.obtain();
+                        Message m = new Message();
+                        Bundle bundle = new Bundle();
                         try {
-                            m.obj = ReadFile(filePath);
-                        } catch (Exception e) {e.printStackTrace(); m.obj = getString(R.string.no_file); Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();}
+                            bundle.putString(FILE_SCRIPT, ReadFile(filePath));
+                            String[] parts = filePath.split("/");
+                            Log.d("MainActivity", parts[parts.length - 1]);
+                            bundle.putString(FILE_NAME, parts[parts.length - 1]);
+                        } catch (Exception e) {e.printStackTrace(); bundle.putString(FILE_SCRIPT, getString(R.string.no_file)); bundle.putString(FILE_NAME, getString(R.string.no_file)); Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();}
+                        m.obj = bundle;
                         f.sendMessage(m);
                     }); thread.start();
                 }
                 break;
             }
         }
+    }*/
+    private Uri uri = null;
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if (requestCode == PICK_HTML_FILE && resultCode == Activity.RESULT_OK) {
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+
+            if (resultData != null) {
+                uri = resultData.getData();
+                // Perform operations on the document using its URI.
+                Thread thread = new Thread(() -> {
+                    String filePath = uri.toString();
+                    filePath = filePath.split(":")[1];
+                    System.out.println(filePath);
+                    Message m = new Message();
+                    Bundle bundle = new Bundle();
+                    try {
+                        bundle.putString(FILE_SCRIPT, getScriptFromUri(uri));
+                        String[] parts = filePath.split("/");
+                        Log.d("MainActivity", parts[parts.length - 1]);
+                        bundle.putString(FILE_NAME, parts[parts.length - 1]);
+                    } catch (Exception e) {e.printStackTrace(); bundle.putString(FILE_SCRIPT, getString(R.string.no_file)); bundle.putString(FILE_NAME, getString(R.string.no_file)); Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();}
+                    m.obj = bundle;
+                    f.sendMessage(m);
+                }); thread.start();
+            }
+        }
     }
 
-    private void chooseFile() {
-        Intent PickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        PickerIntent.setType("*/*");
-        startActivityForResult(PickerIntent, 1);
+    private String getScriptFromUri(Uri uri) {
+        String content;
+        try {
+            InputStream in = getContentResolver().openInputStream(uri);
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            StringBuilder total = new StringBuilder();
+            for (String line; (line = r.readLine()) != null; ) {
+                total.append(line).append('\n');
+            }
+            content = total.toString();
+        } catch (Exception e) {content = e.toString();}
+        return content;
     }
+
+//    private String readTextFile(File file) throws IOException {
+//        StringBuilder text = new StringBuilder();
+//        if (isStoragePermissionGranted()) {
+//            FileInputStream inputStream = new FileInputStream(file);
+//            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+//            String str = "";
+//            while ((str = br.readLine()) != null) {
+//                text.append(str);
+//            }
+//        } else {
+//            Toast.makeText(getApplicationContext(), "Unfortunately, you can\'t use files from your storage without this permission here", Toast.LENGTH_LONG);
+//        }
+//        return text.toString();
+//    }
+//
+//    private void chooseFile() {
+//        Intent PickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+//        PickerIntent.setType("*/*");
+//        startActivityForResult(PickerIntent, 1);
+//    }
 
     public  boolean isStoragePermissionGranted() {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -170,25 +254,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String ReadFile(String filePathName) {
-        StringBuilder text = new StringBuilder();
-        if (isStoragePermissionGranted()) {
-            try {
-                String storageDirectory = Environment.getExternalStorageDirectory().toString();
-                File file = new File(storageDirectory + "/" + filePathName);
-                FileInputStream inputStream = new FileInputStream(file);
-                BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-                String str = "";
-                while ((str = br.readLine()) != null) {
-                    text.append(str);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println(text.toString());
-        }
-        return text.toString();
-    }
+//    private String ReadFile(String filePathName) {
+//        StringBuilder text = new StringBuilder();
+//        if (isStoragePermissionGranted()) {
+//            try {
+//                String storageDirectory = Environment.getExternalStorageDirectory().toString();
+//                File file = new File(storageDirectory + "/" + filePathName);
+//                FileInputStream inputStream = new FileInputStream(file);
+//                BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+//                String str = "";
+//                while ((str = br.readLine()) != null) {
+//                    text.append(str);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println(text.toString());
+//        }
+//        return text.toString();
+//    }
 
     private void showScrollingText (String text) {
         scrollTextView = new ScrollTextView(getApplicationContext());

@@ -191,11 +191,19 @@
                         android:text="@string/text"
                         android:textAppearance="@style/color_text" />
 
-                    <View
+                    <!--<View
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:layout_marginEnd="10dp"
-                        android:background="@drawable/color_square" />
+                        android:background="@drawable/color_square" />-->
+
+
+                    <fragment
+                        android:id="@+id/fragment"
+                        android:name="com.example.TeleprompterAndroid.TestPreferenceFragment"
+                        android:layout_width="32dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_height="32dp"/>
                 </LinearLayout>
 
                 <LinearLayout
