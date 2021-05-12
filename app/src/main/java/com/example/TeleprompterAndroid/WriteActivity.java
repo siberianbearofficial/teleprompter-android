@@ -79,8 +79,8 @@ public class WriteActivity extends AppCompatActivity {
         textsize = Integer.parseInt(intent.getStringExtra("TEXTSIZE"));
         speed = Integer.parseInt(intent.getStringExtra("SPEED"));
         textsizeView.setText(Integer.toString(textsize));
-        speedView.setProgress(toPercentValue(speed));
-        Log.d("WRITE_ACTIVITY: ", "Script: " + script + ", Speed: " + toPercentValue(speed));
+        speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
+        Log.d("WRITE_ACTIVITY: ", "Script: " + script + ", Speed: " + NewScrollTEXT.toPercentValue(speed));
 
         // Checks whether the device supports bluetooth or not
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -269,19 +269,11 @@ public class WriteActivity extends AppCompatActivity {
                 int speedGot = seekBar.getProgress();
                 Log.d("SEEK_BAR", "Speed got: " + Integer.toString(speedGot));
                 // от 1 до 50, было от 0 до 100; делаем сначала от 0 до 49, потом от 1 до 50
-                speedGot = toSpeedValue(speedGot);
+                speedGot = NewScrollTEXT.toSpeedValue(speedGot);
                 Log.d("SEEK_BAR", "Speed ready: " + speedGot);
                 changeSpeed(speedGot);
             }
         });
-    }
-
-    private int toSpeedValue (int speedGot) {
-        return (int) (((100 - speedGot) / 100f) * 49 + 1);
-    }
-
-    private int toPercentValue (int speedGot) {
-        return 100 - ((int) ((speedGot - 1) / 49f * 100));
     }
 
     public void Stop (View view) {

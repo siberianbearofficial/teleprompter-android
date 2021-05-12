@@ -120,13 +120,9 @@ public class NewMainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "Not available feature", Toast.LENGTH_SHORT).show();
     }
 
-    public void Create (View view) {
-        startActivity(new Intent(getApplicationContext(), EditorActivityBluetoothDevice.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));
-    }
+    public void Create (View view) {startActivity(new Intent(getApplicationContext(), EditorActivityBluetoothDevice.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));}
 
-    public void Upload (View view) {
-        fileHelper.openFile();
-    }
+    public void Upload (View view) {fileHelper.openFile();}
 
-    public void Broadcast (View view) {Toast.makeText(getApplicationContext(), "This feature is always activated in test mode", Toast.LENGTH_SHORT).show();}
+    public void Broadcast (View view) {startActivity(new Intent(getApplicationContext(), EditorActivity.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));}
 }

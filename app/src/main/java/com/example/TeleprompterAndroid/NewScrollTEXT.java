@@ -134,10 +134,6 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
     }
 
     public void changeSpeed (int speed) {
-        changeSpeedA(speed);
-    }
-
-    private void changeSpeedA (int speed) {
         Message msg = new Message();
         msg.obj = speed;
         msg.arg1 = CHANGE_SPEED;
@@ -149,6 +145,14 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
         msg.obj = mode;
         msg.arg1 = CHANGE_MODE;
         handler.sendMessage(msg);
+    }
+
+    public static int toSpeedValue (int speedGot) {
+        return (int) (((100 - speedGot) / 100f) * 49 + 1);
+    }
+
+    public static int toPercentValue (int speedGot) {
+        return 100 - ((int) ((speedGot - 1) / 49f * 100));
     }
 
     private boolean pause = false;
@@ -163,8 +167,11 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
                 if (msg.what == PAUSE_MODE) {
                     pause = (boolean) msg.obj;
                     // scroller.forceFinished(true);
-                    pauseY = scroller.getCurrY();
+                    if (pause) {
+                        pauseY = scroller.getCurrY();
+                    }
                     scroller.abortAnimation();
+                    scroll();
                     // scroller.startScroll(pauseX, pauseOffset, 0, 0, 1);
                 }
             }
@@ -194,7 +201,7 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
                 pauseFlag = false;
             } else scroller.startScroll(0, offset, 0, distance, duration);
         }
-        else scroller.startScroll(0, pauseY, 0, 0, 10);
+        else scroller.startScroll(0, pauseY, 0, 0, 1000);
 
         if (continuousScrolling) {
             post(this);

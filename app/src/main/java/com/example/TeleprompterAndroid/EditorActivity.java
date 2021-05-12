@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.chinalwb.are.AREditText;
 import com.chinalwb.are.AREditor;
 import com.google.gson.Gson;
 
@@ -32,11 +33,18 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
+import static com.example.TeleprompterAndroid.Consts.FILE_SPEED;
+import static com.example.TeleprompterAndroid.Consts.FILE_TEXT_SIZE;
+
 public class EditorActivity extends AppCompatActivity {
 
     private ImageButton SaveTextButton, PlayButton;
     private AREditor arEditor;
     private EditText titleET;
+    private int textSize;
+    private int speed;
+    private String script;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,20 +60,31 @@ public class EditorActivity extends AppCompatActivity {
         arEditor.setHideToolbar(false);
         arEditor.setToolbarAlignment(AREditor.ToolbarAlignment.BOTTOM);
 
+        Intent intent = getIntent();
+        textSize = Integer.parseInt(intent.getStringExtra(FILE_TEXT_SIZE));
+        speed = Integer.parseInt(intent.getStringExtra(FILE_SPEED));
+        script = intent.getStringExtra(FILE_SCRIPT);
+
+        AREditText arEditText = arEditor.getARE();
+        arEditText.setText(script);
+        arEditText.setTextSize(textSize);
+
         SaveTextButton.setOnClickListener(v -> {
-            String gotText = arEditor.getHtml();
-            Thread thread = new Thread(() -> {
+            script = arEditor.getHtml();
+            new Thread(() -> {
                 try {
-                    Send(titleET.getText().toString(), gotText);
+                    Send(titleET.getText().toString(), script);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                startActivity(new Intent(getApplicationContext(), MainActivity.class).putExtra("TEXT", gotText).putExtra("TITLE", titleET.getText().toString()));
-            });
-            thread.start();
+                startActivity(new Intent(getApplicationContext(), MainActivity.class).putExtra("TEXT", script).putExtra("TITLE", titleET.getText().toString()));
+            }).start();
         });
 
-        PlayButton.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), PlayActivity.class).putExtra("TEXT", arEditor.getHtml()).putExtra("TITLE", titleET.getText().toString())));
+        PlayButton.setOnClickListener(v -> {
+            script = arEditor.getHtml();
+            startActivity(new Intent(getApplicationContext(), PlayActivity.class).putExtra("SCRIPT", script).putExtra("TITLE", titleET.getText().toString()).putExtra("TEXTSIZE", Integer.toString(textSize)).putExtra("SPEED", Integer.toString(speed)));
+        });
     }
 
     private void Send (String title, String text) throws IOException {
