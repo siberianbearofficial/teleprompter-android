@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "300471537841",
+    "project_id": "teleprompterandroidjava",
+    "storage_bucket": "teleprompterandroidjava.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:300471537841:android:87ecbcf7cbe7018bddd290",
+        "android_client_info": {
+          "package_name": "com.example.TeleprompterAndroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "300471537841-gqq697a9n701mv1un9i850ictllhnmdu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNxvYI8FZcxlM8-uwLSv-czcjs8okBL2E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "300471537841-gqq697a9n701mv1un9i850ictllhnmdu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
