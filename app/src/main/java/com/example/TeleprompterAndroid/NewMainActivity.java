@@ -58,14 +58,14 @@ public class NewMainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String name = intent.getStringExtra("NAME");
 
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("message");
+        //database = FirebaseDatabase.getInstance();
+        //myRef = database.getReference("message");
 
         userDisplayName = findViewById(R.id.user_displayName);
 
-        myRef.setValue(name);
+        //myRef.setValue(name);
 
-        myRef.addValueEventListener(new ValueEventListener() {
+        /*myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -80,7 +80,7 @@ public class NewMainActivity extends AppCompatActivity {
                 // Failed to read value
                 Log.w("FirebaseRealtimeDatabase", "Failed to read value.", error.toException());
             }
-        });
+        });*/
 
         //Show all files to open
         int count = 10;
@@ -157,4 +157,6 @@ public class NewMainActivity extends AppCompatActivity {
     public void Upload (View view) {fileHelper.openFile();}
 
     public void Broadcast (View view) {startActivity(new Intent(getApplicationContext(), EditorActivity.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));}
+
+    public void ToSettingsActivity (View view) {startActivity(new Intent(getApplicationContext(), SettingsActivity.class));}
 }

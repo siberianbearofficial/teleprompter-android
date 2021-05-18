@@ -24,19 +24,12 @@ public class StartActivity extends AppCompatActivity {
 
     private EditText login, pass;
     private View broadcastButton, bluetoothButton, wifiButton, tabletBroadcastButtons;
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
+    private AuthHelper authHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-
-        mAuth = FirebaseAuth.getInstance();
-
-        database = FirebaseDatabase.getInstance("https://teleprompterandroidjava-default-rtdb.europe-west1.firebasedatabase.app/");
-        myRef = database.getReference();
 
         login = findViewById(R.id.email_sign_in_et);
         pass = findViewById(R.id.password_sign_in_et);
@@ -44,6 +37,8 @@ public class StartActivity extends AppCompatActivity {
         bluetoothButton = findViewById(R.id.bluetooth_button_sign_in);
         wifiButton = findViewById(R.id.wifi_button_sign_in);
         tabletBroadcastButtons = findViewById(R.id.tablet_broadcast_buttons);
+
+        authHelper = new AuthHelper(this);
 
         broadcastButton.setOnClickListener(v -> tabletBroadcastButtons.setVisibility((tabletBroadcastButtons.getVisibility() == View.GONE) ? View.VISIBLE : View.GONE));
 
@@ -73,35 +68,14 @@ public class StartActivity extends AppCompatActivity {
         String emailString = login.getText().toString();
         String passString = pass.getText().toString();
 
-        mAuth.signInWithEmailAndPassword(emailString, passString)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        authHelper.loginUser(emailString, passString);
 
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("FirebaseAuth", "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            String name = "Test name";
-                            writeNewUser(user.getUid(), name, emailString);
-                            startActivity(new Intent(getApplicationContext(), NewMainActivity.class).putExtra("NAME", name));
-                            // updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("FirebaseAuth", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            // updateUI(null);
-                        }
-                    }
-                });
+
 
         // if OK: startActivity(new Intent(getApplicationContext(), NewMainActivity.class));
     }
 
-    public void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email);
-
-        myRef.child("users").child(userId).setValue(user);
+    public void ToRegistrationActivity (View view) {
+        startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
     }
 }

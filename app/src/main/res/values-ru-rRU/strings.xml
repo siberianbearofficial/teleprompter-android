@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_label">Войти</string>
+    <string name="password_hint">Пароль</string>
+    <string name="next_button" translatable="false">Далее</string>
+    <string name="speed">Скорость</string>
+    <string name="color">Цвет</string>
+    <string name="control">Управление</string>
+    <string name="skip">Пропустить</string>
+    <string name="title_label_editor">Название</string>
+    <string name="sign_up">Регистрация</string>
+    <string name="forgot_password">Забыли пароль?</string>
+    <string name="test_file_name">Телепрограмма “Школа и Я”</string>
+    <string name="test_profile_name">Морозов Юрий</string>
+    <string name="connect">Подключить</string>
+    <string name="background">Фон</string>
+    <string name="text">Текст</string>
+    <string name="size">Размер</string>
+    <string name="name_hint">Имя</string>
+    <string name="settings_label">Настройки</string>
+    <string name="about">О приложении</string>
+</resources>

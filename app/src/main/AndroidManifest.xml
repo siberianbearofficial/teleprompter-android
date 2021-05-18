@@ -19,6 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TeleprompterAndroid"
         android:usesCleartextTraffic="true">
+        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".RegisterActivity" />
         <activity android:name=".PlayActivity" />
         <activity android:name=".NewMainActivity" />
         <activity android:name=".ReadActivity" />
@@ -32,9 +34,7 @@
         </activity>
         <activity android:name=".EditorActivity" />
         <activity android:name=".EditorActivityBluetoothDevice" />
-        <activity android:name=".MainActivity">
-
-        </activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

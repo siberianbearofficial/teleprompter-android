@@ -1,53 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/google_pixe"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/white">
 
     <View
         android:id="@+id/broadcast_button_sign_in"
         android:layout_width="160dp"
         android:layout_height="142dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="-51dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="-54dp"
         android:background="@drawable/ellipse_11"
-        />
-
-    <!-- Ellipse 8 -->
+        android:translationX="51dp"
+        android:translationY="-54dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="13dp"
-        android:layout_marginEnd="26dp"
-        android:src="@drawable/tablet_icon" />
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="28dp"
+        android:src="@drawable/tablet_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:layout_width="543dp"
         android:layout_height="543dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="-187dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="-395dp"
         android:background="@drawable/ellipse_8"
-        />
+        android:translationX="-187dp"
+        android:translationY="-395dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/tablet_broadcast_buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:layout_marginTop="105dp"
         android:layout_marginEnd="19dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
         android:orientation="vertical">
 
@@ -58,25 +55,20 @@
             android:layout_marginBottom="10dp">
 
             <View
-                android:id="@+id/view6"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:background="@drawable/ellipse_13"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/bluetooth_icon"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -92,7 +84,6 @@
                 android:background="@drawable/ellipse_12"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -102,7 +93,6 @@
                 android:src="@drawable/wifi_icon"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -113,8 +103,9 @@
     <TextView
         android:layout_width="269dp"
         android:layout_height="68dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:fontFamily="@font/montserrat_alternates_bold"
         android:layout_alignParentTop="true"
         android:layout_marginTop="11dp"
@@ -123,146 +114,151 @@
         android:gravity="top"
         />
 
-    <!-- Email -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="220dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <View
-        android:layout_width="361dp"
-        android:layout_height="70dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="24dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="224dp"
-        android:background="@drawable/rectangle_6"
-        />
+        <!-- Email -->
 
-    <EditText
-        android:id="@+id/email_sign_in_et"
-        android:inputType="textEmailAddress"
-        android:layout_width="278dp"
-        android:layout_height="58.8dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="56dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="235dp"
-        android:fontFamily="@font/montserrat_alternates_light"
-        android:hint="@string/email_hint"
-        android:textAppearance="@style/email"
-        android:gravity="top"
-        />
+        <EditText
+            android:id="@+id/email_sign_in_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/rectangle_6"
+            android:fontFamily="@font/montserrat_alternates_light"
+            android:gravity="center_vertical"
+            android:hint="@string/email_hint"
+            android:inputType="textEmailAddress"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:textAppearance="@style/email" />
 
-    <!-- Пароль -->
+        <!-- Пароль -->
 
-    <View
-        android:layout_width="361dp"
-        android:layout_height="70dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="24dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="313dp"
-        android:background="@drawable/rectangle_5"
-        />
+        <EditText
+            android:id="@+id/password_sign_in_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="25dp"
+            android:background="@drawable/rectangle_6"
+            android:fontFamily="@font/montserrat_alternates_light"
+            android:gravity="center_vertical"
+            android:hint="@string/password_hint"
+            android:inputType="textPassword"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:textAppearance="@style/password" />
 
-    <EditText
-        android:inputType="textPassword"
-        android:id="@+id/password_sign_in_et"
-        android:layout_width="278dp"
-        android:layout_height="58.8dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="56dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="325dp"
-        android:hint="@string/password_hint"
-        android:fontFamily="@font/montserrat_alternates_light"
-        android:textAppearance="@style/password"
-        android:gravity="top"
-        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:orientation="horizontal">
 
-    <!-- Забыли пароль? -->
-    <TextView
-        android:layout_width="189dp"
-        android:layout_height="69dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="24dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="414dp"
-        android:text="@string/forgot_password"
-        android:fontFamily="@font/montserrat_alternates_light_italic"
-        android:textAppearance="@style/forgot_password"
-        android:gravity="center_horizontal|center_vertical"
-        />
+            <!-- Забыли пароль? -->
 
-    <!-- Далее -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/forgot_password"
+                android:fontFamily="@font/montserrat_alternates_light_italic"
+                android:textAppearance="@style/forgot_password"
+                android:layout_gravity="center_vertical"
+                />
 
-    <ImageButton
-        android:onClick="Login"
-        android:layout_width="167dp"
-        android:layout_height="69dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="213dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="414dp"
-        android:src="@drawable/rectangle_7"
-        />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
 
-    <TextView
-        android:layout_width="94dp"
-        android:layout_height="39dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="255dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="434dp"
-        android:text="@string/next_button"
-        android:fontFamily="@font/montserrat_alternates_bold"
-        android:textAppearance="@style/next_button"
-        android:gravity="top"
-        />
+            <!--    Кнопка "Далее"   -->
 
-    <!-- Пропустить -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end">
 
-    <TextView
-        android:layout_width="109.72dp"
-        android:layout_height="17.07dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="264.61dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="536.46dp"
-        android:text="@string/skip"
-        android:fontFamily="@font/montserrat_alternates_medium"
-        android:textAppearance="@style/skip"
-        android:gravity="top"
-        />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="Login"
+                    android:background="@drawable/rectangle_7"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:layout_width="102dp"
-        android:layout_height="1dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="266dp"
-        android:layout_marginTop="556dp"
-        android:background="@drawable/line_13" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/montserrat_alternates_bold"
+                    android:text="@string/next_button"
+                    android:textAppearance="@style/next_button"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <!-- Пропустить -->
+
+        <TextView
+            android:layout_width="109.72dp"
+            android:layout_height="17.07dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="264.61dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="536.46dp"
+            android:text="@string/skip"
+            android:fontFamily="@font/montserrat_alternates_medium"
+            android:textAppearance="@style/skip"
+            android:gravity="top"
+            />
+
+        <View
+            android:layout_width="102dp"
+            android:layout_height="1dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="266dp"
+            android:layout_marginTop="556dp"
+            android:background="@drawable/line_13" />
+
+    </LinearLayout>
 
     <!-- Регистрация -->
 
     <View
         android:layout_width="543dp"
         android:layout_height="543dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="-110dp"
-        android:layout_marginBottom="-410dp"
-        android:background="@drawable/ellipse_9" />
+        android:background="@drawable/ellipse_9"
+        android:translationX="130dp"
+        android:translationY="440dp"
+        android:onClick="ToRegistrationActivity"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/some_id"
-        android:layout_width="191dp"
-        android:layout_height="27dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="163dp"
-        android:layout_marginBottom="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="65dp"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:fontFamily="@font/montserrat_alternates_bold"
         android:gravity="top"
         android:text="@string/sign_up"
         android:textAppearance="@style/sign_up" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

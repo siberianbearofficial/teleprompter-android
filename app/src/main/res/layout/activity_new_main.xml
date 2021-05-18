@@ -66,6 +66,15 @@
                     android:layout_marginStart="5dp"
                     android:onClick="Broadcast"
                     android:background="@drawable/broadcast_button" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:layout_marginStart="5dp"
+                    android:onClick="ToSettingsActivity"
+                    android:background="@drawable/test_settings_icon" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
