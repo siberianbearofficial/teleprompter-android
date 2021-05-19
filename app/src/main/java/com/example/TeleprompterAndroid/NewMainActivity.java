@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
@@ -45,8 +46,7 @@ public class NewMainActivity extends AppCompatActivity {
     private Handler handler;
     private FileHelper fileHelper;
     private TextView userDisplayName;
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
+    private AuthHelper authHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,32 +55,25 @@ public class NewMainActivity extends AppCompatActivity {
         textsize = 48;
         speed = 30;
 
-        Intent intent = getIntent();
-        String name = intent.getStringExtra("NAME");
+        //Intent intent = getIntent();
+        //String name = intent.getStringExtra("NAME");
 
-        //database = FirebaseDatabase.getInstance();
-        //myRef = database.getReference("message");
+        authHelper = new AuthHelper(this);
 
         userDisplayName = findViewById(R.id.user_displayName);
 
-        //myRef.setValue(name);
+        authHelper.getNameReference().addValueEventListener(new ValueEventListener() {
 
-        /*myRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                userDisplayName.setText(value);
-                Log.d("FirebaseRealtimeDatabase", "Value is: " + value);
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                userDisplayName.setText(authHelper.getCurrentProfileName(snapshot));
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("FirebaseRealtimeDatabase", "Failed to read value.", error.toException());
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("Database error", error.getMessage());
             }
-        });*/
+        });
 
         //Show all files to open
         int count = 10;

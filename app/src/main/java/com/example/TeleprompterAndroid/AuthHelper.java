@@ -12,8 +12,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+
+import java.util.List;
 
 public class AuthHelper {
 
@@ -65,21 +69,45 @@ public class AuthHelper {
                     if (task.isSuccessful()) {
                         Log.d("FirebaseAuth", "signInWithEmail:success");
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        assert user != null;
-                        String name = getProfileName(user.getUid());
-                        activity.startActivity(new Intent(activity.getApplicationContext(), NewMainActivity.class).putExtra("NAME", name));
+                        activity.startActivity(new Intent(activity.getApplicationContext(), NewMainActivity.class));
                     } else {
                         Log.w("FirebaseAuth", "signInWithEmail:failure", task.getException());
-                        Toast.makeText(activity.getApplicationContext(), "Authentication failed.",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity.getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private String getProfileName (String userID) {
-        String name = "Test name";
-        return name;
+    public String getCurrentProfileName (DataSnapshot snapshot) { return snapshot.getValue(String.class); }
+
+    public void saveUserData (String userId, String name, String email) {getUserReference().setValue(new User(email, name)); }
+
+    public String getUId() {return firebaseAuth.getCurrentUser().getUid();}
+
+    public DatabaseReference getDatabaseReference () {return databaseReference;}
+
+    public DatabaseReference getNameReference () {return getUserReference().child("name");}
+
+    public DatabaseReference getSettingsReference () {return getUserReference().child("settings");}
+
+    public DatabaseReference getUserReference () {return getDatabaseReference().child("users").child(getUId());}
+
+    public void saveSpeed (int progress) {getSettingsReference().child("speed").setValue(progress);}
+
+    public void saveTextSize (int textSize) {getSettingsReference().child("textSize").setValue(textSize);}
+
+    public int getSpeedFromSnapshot(DataSnapshot snapshot) {
+        try {
+            return snapshot.child("speed").getValue(Integer.class);
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
-    public void saveUserData (String userId, String name, String email) { databaseReference.child("users").child(userId).setValue(new User(email, name)); }
+    public int getTextSizeFromSnapshot(DataSnapshot snapshot) {
+        try {
+            return snapshot.child("textSize").getValue(Integer.class);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
 }

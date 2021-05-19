@@ -25,8 +25,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
@@ -60,6 +65,8 @@ public class WriteActivity extends AppCompatActivity {
     private BluetoothDevice connectingDevice;
     private WriteController writeController;
 
+    private AuthHelper authHelper;
+
     private boolean mirroring = false;
     private boolean paused = false;
     private boolean connect = true;
@@ -76,10 +83,9 @@ public class WriteActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         script = intent.getStringExtra("SCRIPT");
-        textsize = Integer.parseInt(intent.getStringExtra("TEXTSIZE"));
-        speed = Integer.parseInt(intent.getStringExtra("SPEED"));
-        textsizeView.setText(Integer.toString(textsize));
-        speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
+        //textsize = Integer.parseInt(intent.getStringExtra("TEXTSIZE"));
+        //speed = Integer.parseInt(intent.getStringExtra("SPEED"));
+
         Log.d("WRITE_ACTIVITY: ", "Script: " + script + ", Speed: " + NewScrollTEXT.toPercentValue(speed));
 
         // Checks whether the device supports bluetooth or not
@@ -94,6 +100,31 @@ public class WriteActivity extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, BLUETOOTH_SOLICITATION);
         }
+
+        authHelper = new AuthHelper(this);
+
+        authHelper.getSettingsReference().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int speedGot = authHelper.getSpeedFromSnapshot(snapshot);
+                int textSizeGot = authHelper.getTextSizeFromSnapshot(snapshot);
+
+                if (speedGot != -1)
+                    speed = speedGot;
+
+                if (textSizeGot != -1)
+                    textsize = textSizeGot;
+
+                textsizeView.setText(Integer.toString(textsize));
+                speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show(); }
+        });
+
+        textsizeView.setText(Integer.toString(textsize));
+        speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
     }
 
     private Handler handler = new Handler(Looper.getMainLooper()) {

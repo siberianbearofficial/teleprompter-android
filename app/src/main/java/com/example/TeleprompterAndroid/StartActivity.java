@@ -69,10 +69,6 @@ public class StartActivity extends AppCompatActivity {
         String passString = pass.getText().toString();
 
         authHelper.loginUser(emailString, passString);
-
-
-
-        // if OK: startActivity(new Intent(getApplicationContext(), NewMainActivity.class));
     }
 
     public void ToRegistrationActivity (View view) {
