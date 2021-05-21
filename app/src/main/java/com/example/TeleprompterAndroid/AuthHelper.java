@@ -69,7 +69,7 @@ public class AuthHelper {
                     if (task.isSuccessful()) {
                         Log.d("FirebaseAuth", "signInWithEmail:success");
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        activity.startActivity(new Intent(activity.getApplicationContext(), NewMainActivity.class));
+                        activity.startActivity(new Intent(activity.getApplicationContext(), NewMainActivity.class).putExtra("IS_AUTHED", true));
                     } else {
                         Log.w("FirebaseAuth", "signInWithEmail:failure", task.getException());
                         Toast.makeText(activity.getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();

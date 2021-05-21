@@ -6,88 +6,17 @@
     android:background="#3371BBFF">
 
     <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/main_fragment_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="horizontal">
+        android:layout_weight="15" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:padding="10dp"
-            android:src="@drawable/avatar_example"
-            android:onClick="BluetoothWriteMode" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/user_displayName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:fontFamily="@font/montserrat_alternates_medium"
-                android:text="@string/test_profile_name"
-                android:textAppearance="@style/profile_name" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:onClick="Create"
-                    android:background="@drawable/create_button" />
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_weight="1"
-                    android:onClick="Upload"
-                    android:background="@drawable/upload_button" />
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:onClick="Broadcast"
-                    android:background="@drawable/broadcast_button" />
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:layout_marginStart="5dp"
-                    android:onClick="ToSettingsActivity"
-                    android:background="@drawable/test_settings_icon" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/navigation_bar_container"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:id="@+id/files_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+        android:layout_weight="1"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:padding="25dp"
+    android:orientation="vertical"
+    tools:context=".DevelopedByFragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/developed_by"
+        android:fontFamily="@font/montserrat_alternates_regular"
+        android:textSize="16sp"
+        android:textColor="#001F8C"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/vk_ico" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="@string/developer_vk"
+                android:paddingTop="10dp"
+                android:fontFamily="@font/montserrat_alternates_regular"
+                android:textSize="16sp"
+                android:textColor="#001F8C"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/designer_vk"
+                android:paddingBottom="10dp"
+                android:fontFamily="@font/montserrat_alternates_regular"
+                android:textSize="16sp"
+                android:textColor="#001F8C"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/copyright"
+        android:fontFamily="@font/montserrat_alternates_regular"
+        android:textSize="10sp"
+        android:textColor="#9A001F8C"/>
+
+</LinearLayout>

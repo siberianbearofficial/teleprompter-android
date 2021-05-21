@@ -74,4 +74,8 @@ public class StartActivity extends AppCompatActivity {
     public void ToRegistrationActivity (View view) {
         startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
     }
+
+    public void Skip (View view) {
+        startActivity(new Intent(getApplicationContext(), NewMainActivity.class).putExtra("IS_AUTHED", false));
+    }
 }

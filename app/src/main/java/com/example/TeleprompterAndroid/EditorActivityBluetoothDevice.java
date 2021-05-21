@@ -32,8 +32,6 @@ public class EditorActivityBluetoothDevice extends AppCompatActivity {
     private ImageButton SaveTextButton, PlayButton;
     private AREditor arEditor;
     private EditText titleET;
-    private int textSize;
-    private int speed;
     private String script;
 
     @Override
@@ -42,8 +40,6 @@ public class EditorActivityBluetoothDevice extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
 
         Intent intent = getIntent();
-        textSize = Integer.parseInt(intent.getStringExtra(FILE_TEXT_SIZE));
-        speed = Integer.parseInt(intent.getStringExtra(FILE_SPEED));
         script = intent.getStringExtra(FILE_SCRIPT);
 
         SaveTextButton = findViewById(R.id.button_save_text);
@@ -55,7 +51,6 @@ public class EditorActivityBluetoothDevice extends AppCompatActivity {
         arEditor.setHideToolbar(false);
         arEditor.setToolbarAlignment(AREditor.ToolbarAlignment.BOTTOM);
         AREditText arEditText = arEditor.getARE();
-        arEditText.setTextSize(textSize);
         arEditText.setText(Html.fromHtml(script, Html.FROM_HTML_MODE_LEGACY));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             arEditText.setTypeface(getResources().getFont(R.font.montserrat_alternates_light));
@@ -76,7 +71,7 @@ public class EditorActivityBluetoothDevice extends AppCompatActivity {
 
         PlayButton.setOnClickListener(v -> {
             String gotText = arEditor.getHtml();
-            startActivity(new Intent(getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", gotText).putExtra("TEXTSIZE", Integer.toString(textSize)).putExtra("SPEED", Integer.toString(speed)));
+            startActivity(new Intent(getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", gotText));
         });
     }
 

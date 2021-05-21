@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:are="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context=".EditorActivityFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/back_button_on_editor_fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:backgroundTint="#00FFFFFF"
+            android:src="@drawable/back_button_editor" />
+
+        <TextView
+            android:id="@+id/title_tv_on_editor_fragment"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_alternates_medium"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:layout_gravity="center_vertical"
+            android:text="@string/test_editor_title" />
+
+        <ImageButton
+            android:id="@+id/share_button_on_editor_fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#00FFFFFF"
+            android:src="@drawable/share_button_blue" />
+
+        <ImageButton
+            android:id="@+id/save_text_button_on_editor_fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#00FFFFFF"
+            android:src="@drawable/save_button_blue" />
+
+        <ImageButton
+            android:id="@+id/play_button_on_editor_fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#00FFFFFF"
+            android:src="@drawable/play_arrow_button_green" />
+    </LinearLayout>
+
+    <com.chinalwb.are.AREditor
+        android:id="@+id/areditor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_green_dark"
+        are:expandMode="MIN"
+        are:hideToolbar="true"
+        are:toolbarAlignment="TOP" />
+
+</LinearLayout>

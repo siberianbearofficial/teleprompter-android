@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -15,6 +16,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,82 +44,30 @@ import static com.example.TeleprompterAndroid.Consts.*;
 
 public class NewMainActivity extends AppCompatActivity {
 
-    private int textsize;
-    private int speed;
-    private Handler handler;
-    private FileHelper fileHelper;
-    private TextView userDisplayName;
-    private AuthHelper authHelper;
+
+    private boolean isAuthed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_main);
-        textsize = 48;
-        speed = 30;
-
-        //Intent intent = getIntent();
-        //String name = intent.getStringExtra("NAME");
-
-        authHelper = new AuthHelper(this);
-
-        userDisplayName = findViewById(R.id.user_displayName);
-
-        authHelper.getNameReference().addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userDisplayName.setText(authHelper.getCurrentProfileName(snapshot));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w("Database error", error.getMessage());
-            }
-        });
-
-        //Show all files to open
-        int count = 10;
-        /*ArrayList<String> fileNames = new ArrayList<>();
-        ArrayList<String> fileDates = new ArrayList<>();
-        ArrayList<FileFragment> files = new ArrayList<>();*/
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager
-                .beginTransaction();
 
-        Random random = new Random();
-        for (int i = 0; i < count; i++) {
-            FileFragment fileFragment = new FileFragment();
-            Bundle args = new Bundle();
-            args.putString(FILE_NAME, getString(R.string.test_file_name));
-            args.putString(FILE_DATE, getString(R.string.test_date));
-            args.putBoolean(FILE_STAR, random.nextBoolean());
-            args.putInt(FILE_TEXT_SIZE, textsize);
-            args.putInt(FILE_SPEED, speed);
-            args.putString(FILE_SCRIPT, "Test Script NEW!");
-            fileFragment.setArguments(args);
-            fragmentTransaction.add(R.id.files_container, fileFragment);
-        }
-
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.main_fragment_view, new MainActivityFragment());
         fragmentTransaction.commit();
 
-        fileHelper = new FileHelper(this);
-
-        handler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                startActivity(fileHelper.prepareIntent(msg, textsize, speed));
-            }
-        };
-
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.navigation_bar_container, new NavigationBar());
+        fragmentTransaction.commit();
     }
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         fileHelper.sendFileToHandler(requestCode, resultCode, data, handler);
-    }
+    }*/
 
     private void getAllArticles () throws IOException {
         OkHttpClient httpClient = new OkHttpClient();
@@ -140,16 +91,5 @@ public class NewMainActivity extends AppCompatActivity {
         }
     }
 
-    public void BluetoothWriteMode(View v) {
-        //startActivity(new Intent(getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", "Test script").putExtra("TEXTSIZE", Integer.toString(textsize)).putExtra("SPEED", Integer.toString(speed)));
-        Toast.makeText(getApplicationContext(), "Not available feature", Toast.LENGTH_SHORT).show();
-    }
 
-    public void Create (View view) {startActivity(new Intent(getApplicationContext(), EditorActivityBluetoothDevice.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));}
-
-    public void Upload (View view) {fileHelper.openFile();}
-
-    public void Broadcast (View view) {startActivity(new Intent(getApplicationContext(), EditorActivity.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));}
-
-    public void ToSettingsActivity (View view) {startActivity(new Intent(getApplicationContext(), SettingsActivity.class));}
 }

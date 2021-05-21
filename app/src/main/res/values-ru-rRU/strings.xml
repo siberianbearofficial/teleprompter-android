@@ -19,4 +19,11 @@
     <string name="name_hint">Имя</string>
     <string name="settings_label">Настройки</string>
     <string name="about">О приложении</string>
+    <string name="attention">Внимание!</string>
+    <string name="guest_mode_attention">В гостевом режиме многие фунции недоступны.\nПодробная информация в разделе “О приложении” в Настройках.</string>
+    <string name="please_sign_up">Зарегистрируйтесь</string>
+    <string name="or">или</string>
+    <string name="please_sign_in">Войдите в аккаунт</string>
+    <string name="guest">Гость</string>
+    <string name="developed_by">Разработчик: Алексей Орлов\nДизайнер: Юрий Морозов</string>
 </resources>

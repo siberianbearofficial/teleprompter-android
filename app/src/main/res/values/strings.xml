@@ -30,6 +30,10 @@
     <string name="next_button">Next</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="sign_up">Register</string>
+    <string name="please_sign_up">Sign up</string>
+    <string name="or">or</string>
+    <string name="please_sign_in">Sign in</string>
+    <string name="guest">Guest</string>
     <string name="title_label_editor">Title</string>
     <string name="skip">Skip</string>
     <string name="control">Remote</string>
@@ -43,4 +47,11 @@
     <string name="test_profile_name">Morozoff Yuri</string>
     <string name="test_file_name">TV program \"School and I\"</string>
     <string name="name_hint">Name</string>
+    <string name="attention">Attention!</string>
+    <string name="guest_mode_attention">In guest mode many functions are unavailable.\nMore information in \"About this app\" in Settings.</string>
+    <string name="developed_by">Developed by: Aleksei Orlov\nDesigned by: Yuri Morozoff</string>
+    <string name="developer_vk" translatable="false">\@alexey_orlov65</string>
+    <string name="designer_vk" translatable="false">\@business_operator</string>
+    <string name="copyright" translatable="false">©SBC</string>
+    <string name="test_editor_title" translatable="false">Телепрограм...</string>
 </resources>
