@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chinalwb.are.AREditText;
 import com.chinalwb.are.AREditor;
@@ -76,13 +77,13 @@ public class EditorActivityFragment extends Fragment {
         TitleTV.setText(title);
 
         SaveButton.setOnClickListener(v -> {
-
+            Toast.makeText(getContext(), "Unavailable feature", Toast.LENGTH_SHORT).show();
         });
         PlayButton.setOnClickListener(v -> {
-
+            ((NewMainActivity) getActivity()).openWriteActivityFragment(arEditText.getHtml());
         });
         ShareButton.setOnClickListener(v -> {
-
+            Toast.makeText(getContext(), "Unavailable feature", Toast.LENGTH_SHORT).show();
         });
         BackButton.setOnClickListener(v -> {
             ((NewMainActivity) getActivity()).openMainActivityFragment();

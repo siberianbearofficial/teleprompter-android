@@ -120,10 +120,10 @@ public class AuthHelper {
     }
 
     public StorageReference getFileReference(String fileName) {
-        return storageReference.child(getUId()).child(fileName);
+        return storageReference.child(getUId()).child("files").child(fileName);
     }
 
-    public void uploadFile (String fileName) {
-
+    public StorageReference getFilesReference() {
+        return storageReference.child(getUId()).child("files");
     }
 }

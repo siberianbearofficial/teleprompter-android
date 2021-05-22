@@ -26,12 +26,14 @@ public class NavigationBar extends Fragment {
 
         homeButton.setOnClickListener(v -> {
             colorButton(0);
+            ((NewMainActivity) getActivity()).openMainActivityFragment();
         });
         profileButton.setOnClickListener(v -> {
             colorButton(1);
         });
         playButton.setOnClickListener(v -> {
             colorButton(2);
+            ((NewMainActivity) getActivity()).openReadActivityFragment();
         });
         settingsButton.setOnClickListener(v -> {
             colorButton(3);

@@ -27,4 +27,5 @@
     <string name="guest">Гость</string>
     <string name="developed_by">Разработчик: Алексей Орлов\nДизайнер: Юрий Морозов</string>
     <string name="use_app_buttons">Используйте кнопки в приложении</string>
+    <string name="return_back">Вернуться назад</string>
 </resources>

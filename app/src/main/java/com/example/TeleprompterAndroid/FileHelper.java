@@ -19,6 +19,9 @@ import androidx.core.app.ActivityCompat;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -132,5 +135,14 @@ public class FileHelper {
             return null;
         }
         return new Intent(activity.getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", fileScript).putExtra("TEXTSIZE", Integer.toString(textSize)).putExtra("SPEED", Integer.toString(speed));
+    }
+
+    public String readContentFromFile(File file) throws IOException {
+        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+        StringBuilder total = new StringBuilder();
+        for (String line; (line = r.readLine()) != null; ) {
+            total.append(line).append('\n');
+        }
+        return total.toString();
     }
 }

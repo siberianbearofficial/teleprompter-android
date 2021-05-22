@@ -53,6 +53,8 @@ public class NewMainActivity extends AppCompatActivity {
     private FragmentTransaction fragmentTransaction;
     private LinearLayout navigationBar;
     private MainActivityFragment mainActivityFragment;
+    private ReadFragment readFragment;
+    private WriteFragment writeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,10 @@ public class NewMainActivity extends AppCompatActivity {
     }
 
     public void openMainActivityFragment() {
+        if (readFragment != null)
+            readFragment.onDestroy();
+        if (writeFragment != null)
+            writeFragment.onDestroy();
         navigationBar.setVisibility(View.VISIBLE);
         fragmentTransaction = fragmentManager.beginTransaction();
         Bundle arguments = new Bundle();
@@ -97,6 +103,29 @@ public class NewMainActivity extends AppCompatActivity {
         mainActivityFragment.setArguments(arguments);
         fragmentTransaction.replace(R.id.main_fragment_view, mainActivityFragment);
         fragmentTransaction.commit();
+    }
+
+    public void openWriteActivityFragment(String script) {
+        navigationBar.setVisibility(View.GONE);
+        fragmentTransaction = fragmentManager.beginTransaction();
+        Bundle arguments = new Bundle();
+        arguments.putString(FILE_SCRIPT, script);
+        writeFragment = new WriteFragment();
+        writeFragment.setArguments(arguments);
+        fragmentTransaction.replace(R.id.main_fragment_view, writeFragment);
+        fragmentTransaction.commit();
+    }
+
+    public void openReadActivityFragment() {
+        navigationBar.setVisibility(View.VISIBLE);
+        fragmentTransaction = fragmentManager.beginTransaction();
+        readFragment = new ReadFragment();
+        fragmentTransaction.replace(R.id.main_fragment_view, readFragment);
+        fragmentTransaction.commit();
+    }
+
+    public void openPlayActivityFragment() {
+
     }
 
     public void openSettingsActivityFragment() {
@@ -108,7 +137,7 @@ public class NewMainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mainActivityFragment.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == BLUETOOTH_SOLICITATION) readFragment.onActivityResult(requestCode, resultCode, data); else mainActivityFragment.onActivityResult(requestCode, resultCode, data);
     }
 
     private void getAllArticles () throws IOException {

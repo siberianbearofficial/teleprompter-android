@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 import static com.example.TeleprompterAndroid.Consts.CHANGE_SPEED;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_TEXT_SIZE;
 import static com.example.TeleprompterAndroid.Consts.FILE_DATE;
@@ -66,7 +68,14 @@ public class FileFragment extends Fragment {
         ImageView starIV = layout.findViewById(R.id.file_star);
         nameTV.setText(name); dateTV.setText(date);
         if (star) starIV.setImageResource(R.drawable.filled_star_icon);
-        nameTV.setOnClickListener(v -> startActivity(new Intent(getContext(), WriteActivity.class).putExtra("SCRIPT", script).putExtra("TEXTSIZE", Integer.toString(textSize)).putExtra("SPEED", Integer.toString(speed))));
+        nameTV.setOnClickListener(v -> {
+            try {
+                ((MainActivityFragment) getParentFragment()).downloadFile(name);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //startActivity(new Intent(getContext(), WriteActivity.class).putExtra("SCRIPT", script).putExtra("TEXTSIZE", Integer.toString(textSize)).putExtra("SPEED", Integer.toString(speed)));
+        });
         return layout;
     }
 }
