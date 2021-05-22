@@ -8,6 +8,8 @@ import androidx.fragment.app.FragmentContainerView;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,29 +47,69 @@ import static com.example.TeleprompterAndroid.Consts.*;
 public class NewMainActivity extends AppCompatActivity {
 
 
-    private boolean isAuthed;
+    private static boolean isAuthed;
+
+    private FragmentManager fragmentManager;
+    private FragmentTransaction fragmentTransaction;
+    private LinearLayout navigationBar;
+    private MainActivityFragment mainActivityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_main);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        navigationBar = findViewById(R.id.navigation_bar_container);
 
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.main_fragment_view, new MainActivityFragment());
-        fragmentTransaction.commit();
+        isAuthed = getIntent().getBooleanExtra(IS_AUTHED, false);
 
+        fragmentManager = getSupportFragmentManager();
+
+        openMainActivityFragment();
+
+        setNavigationBar();
+    }
+
+    private void setNavigationBar () {
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.navigation_bar_container, new NavigationBar());
         fragmentTransaction.commit();
     }
 
-    /*@Override
+    public void openEditorActivityFragment(String title, String script) {
+        navigationBar.setVisibility(View.GONE);
+        fragmentTransaction = fragmentManager.beginTransaction();
+        Bundle arguments = new Bundle();
+        arguments.putString(FILE_NAME, title);
+        arguments.putString(FILE_SCRIPT, script);
+        EditorActivityFragment editorActivityFragment = new EditorActivityFragment();
+        editorActivityFragment.setArguments(arguments);
+        fragmentTransaction.replace(R.id.main_fragment_view, editorActivityFragment);
+        fragmentTransaction.commit();
+    }
+
+    public void openMainActivityFragment() {
+        navigationBar.setVisibility(View.VISIBLE);
+        fragmentTransaction = fragmentManager.beginTransaction();
+        Bundle arguments = new Bundle();
+        arguments.putBoolean(IS_AUTHED, isAuthed);
+        mainActivityFragment = new MainActivityFragment();
+        mainActivityFragment.setArguments(arguments);
+        fragmentTransaction.replace(R.id.main_fragment_view, mainActivityFragment);
+        fragmentTransaction.commit();
+    }
+
+    public void openSettingsActivityFragment() {
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.main_fragment_view, new SettingsActivityFragment());
+        fragmentTransaction.commit();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        fileHelper.sendFileToHandler(requestCode, resultCode, data, handler);
-    }*/
+        mainActivityFragment.onActivityResult(requestCode, resultCode, data);
+    }
 
     private void getAllArticles () throws IOException {
         OkHttpClient httpClient = new OkHttpClient();
@@ -91,5 +133,6 @@ public class NewMainActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    public void onBackPressed() { Toast.makeText(getApplicationContext(), getString(R.string.use_app_buttons), Toast.LENGTH_SHORT).show(); }
 }

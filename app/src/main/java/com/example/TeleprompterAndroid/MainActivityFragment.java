@@ -1,6 +1,7 @@
 package com.example.TeleprompterAndroid;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,10 +23,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.Random;
 
 import static com.example.TeleprompterAndroid.Consts.FILE_DATE;
@@ -34,6 +40,7 @@ import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
 import static com.example.TeleprompterAndroid.Consts.FILE_SPEED;
 import static com.example.TeleprompterAndroid.Consts.FILE_STAR;
 import static com.example.TeleprompterAndroid.Consts.FILE_TEXT_SIZE;
+import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
 
 public class MainActivityFragment extends Fragment {
 
@@ -46,8 +53,6 @@ public class MainActivityFragment extends Fragment {
     private ImageView avatar;
 
     private boolean isAuthed;
-
-    private static final String IS_AUTHED = "is_authed";
 
     private boolean is_authed_got = false;
 
@@ -148,6 +153,7 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 startActivity(fileHelper.prepareIntent(msg, textsize, speed));
+                uploadFile();
             }
         };
 
@@ -161,13 +167,28 @@ public class MainActivityFragment extends Fragment {
         fileHelper.sendFileToHandler(requestCode, resultCode, data, handler);
     }
 
+    private void uploadFile () {
+        Uri file = fileHelper.getFinalUri();
+        String fileName = fileHelper.getFileName();
+        Log.d("FileName", fileName);
+        StorageReference storageReference = authHelper.getFileReference(fileName);
+        UploadTask uploadTask = storageReference.putFile(file);
+
+        uploadTask.addOnFailureListener((OnFailureListener) exception -> {
+            Toast.makeText(getContext(), "Error! Message: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+        }).addOnSuccessListener((OnSuccessListener<UploadTask.TaskSnapshot>) taskSnapshot -> {
+            Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
+        });
+    }
+
     private void BluetoothWriteMode() {
         //startActivity(new Intent(getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", "Test script").putExtra("TEXTSIZE", Integer.toString(textsize)).putExtra("SPEED", Integer.toString(speed)));
         Toast.makeText(getContext(), "Not available feature", Toast.LENGTH_SHORT).show();
     }
 
     private void Create () {
-        startActivity(new Intent(getContext(), EditorActivityBluetoothDevice.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));
+        //startActivity(new Intent(getContext(), EditorActivityBluetoothDevice.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));
+        ((NewMainActivity) getActivity()).openEditorActivityFragment("Test", "Write this!");
     }
 
     private void Upload () {fileHelper.openFile();}

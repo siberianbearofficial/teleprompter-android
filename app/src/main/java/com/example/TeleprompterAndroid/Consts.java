@@ -40,6 +40,8 @@ public class Consts {
     public static final String FILE_SPEED = "FileSpeed";
     public static final String FILE_SCRIPT = "FileScript";
 
+    public static final String IS_AUTHED = "is_authed";
+
     public static final int PICK_HTML_FILE = 2;
 
     public static final UUID MY_UUID = UUID.fromString("85293a76-ff18-4797-b07c-987201c2285e");

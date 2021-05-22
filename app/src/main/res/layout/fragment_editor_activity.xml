@@ -54,7 +54,7 @@
     </LinearLayout>
 
     <com.chinalwb.are.AREditor
-        android:id="@+id/areditor"
+        android:id="@+id/areditor_editor_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/holo_green_dark"

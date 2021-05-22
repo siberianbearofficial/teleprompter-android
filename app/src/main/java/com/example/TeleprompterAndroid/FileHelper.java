@@ -2,18 +2,23 @@ package com.example.TeleprompterAndroid;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.DocumentsContract;
+import android.provider.DocumentsProvider;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -24,6 +29,8 @@ import static com.example.TeleprompterAndroid.Consts.PICK_HTML_FILE;
 public class FileHelper {
 
     private Activity activity;
+    private Uri finalUri;
+    private String fileName;
 
     public FileHelper (Activity activity) {
         this.activity = activity;
@@ -39,10 +46,26 @@ public class FileHelper {
         }
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     private String getScriptFromUri(Uri uri) {
         String content;
         try {
-            InputStream in = activity.getContentResolver().openInputStream(uri);
+            ContentResolver contentResolver = activity.getContentResolver();
+            InputStream in = contentResolver.openInputStream(uri);
+            Cursor cursor = contentResolver.query(uri, new String[]{DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME, DocumentsContract.Document.COLUMN_MIME_TYPE}, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst())
+                {
+                    cursor.moveToFirst();
+                    fileName = cursor.getString(1);
+                }
+            } catch(Exception e)
+            {
+                e.printStackTrace();
+            }
             BufferedReader r = new BufferedReader(new InputStreamReader(in));
             StringBuilder total = new StringBuilder();
             for (String line; (line = r.readLine()) != null; ) {
@@ -71,13 +94,14 @@ public class FileHelper {
             // The result data contains a URI for the document or directory that
             // the user selected.
 
-            Uri uri = null;
+            Uri uri;
 
             if (resultData != null) {
                 uri = resultData.getData();
                 // Perform operations on the document using its URI.
 
-                Uri finalUri = uri;
+                finalUri = uri;
+
                 Thread thread = new Thread(() -> {
                     String filePath = finalUri.toString();
                     filePath = filePath.split(":")[1];
@@ -96,6 +120,8 @@ public class FileHelper {
             }
         }
     }
+
+    public Uri getFinalUri () { return finalUri; }
 
     public Intent prepareIntent(Message message, int textSize, int speed) {
         Bundle bundle = (Bundle) message.obj;

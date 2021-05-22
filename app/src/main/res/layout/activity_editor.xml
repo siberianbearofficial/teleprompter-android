@@ -45,7 +45,7 @@
         android:fontFamily="@font/test_font"/>
 
     <com.chinalwb.are.AREditor
-        android:id="@+id/areditor_editor_fragment"
+        android:id="@+id/areditor"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"

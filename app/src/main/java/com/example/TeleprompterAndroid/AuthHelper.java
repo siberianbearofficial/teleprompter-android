@@ -16,8 +16,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
+
+import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
 
 public class AuthHelper {
 
@@ -25,6 +29,8 @@ public class AuthHelper {
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
 
     public AuthHelper (Activity activity) {
         this.activity = activity;
@@ -32,6 +38,8 @@ public class AuthHelper {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
     }
 
     public boolean isPasswordCorrect (String password) {
@@ -55,7 +63,7 @@ public class AuthHelper {
                         FirebaseUser user = firebaseAuth.getCurrentUser();
                         assert user != null;
                         saveUserData(user.getUid(), nameString, emailString);
-                        activity.startActivity(new Intent(activity.getApplicationContext(), NewMainActivity.class));
+                        activity.startActivity(new Intent(activity.getApplicationContext(), NewMainActivity.class).putExtra(IS_AUTHED, true));
                     } else {
                         Log.w("FirebaseAuth", "signUpWithEmail:failure", task.getException());
                         Toast.makeText(activity.getApplicationContext(), "Registration failed.", Toast.LENGTH_SHORT).show();
@@ -69,7 +77,7 @@ public class AuthHelper {
                     if (task.isSuccessful()) {
                         Log.d("FirebaseAuth", "signInWithEmail:success");
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        activity.startActivity(new Intent(activity.getApplicationContext(), NewMainActivity.class).putExtra("IS_AUTHED", true));
+                        activity.startActivity(new Intent(activity.getApplicationContext(), NewMainActivity.class).putExtra(IS_AUTHED, true));
                     } else {
                         Log.w("FirebaseAuth", "signInWithEmail:failure", task.getException());
                         Toast.makeText(activity.getApplicationContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -109,5 +117,13 @@ public class AuthHelper {
         } catch (Exception e) {
             return -1;
         }
+    }
+
+    public StorageReference getFileReference(String fileName) {
+        return storageReference.child(getUId()).child(fileName);
+    }
+
+    public void uploadFile (String fileName) {
+
     }
 }

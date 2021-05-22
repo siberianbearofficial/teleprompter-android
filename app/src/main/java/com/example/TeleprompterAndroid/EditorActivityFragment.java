@@ -85,7 +85,7 @@ public class EditorActivityFragment extends Fragment {
 
         });
         BackButton.setOnClickListener(v -> {
-
+            ((NewMainActivity) getActivity()).openMainActivityFragment();
         });
 
         return layout;
