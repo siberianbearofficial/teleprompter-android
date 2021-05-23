@@ -2,7 +2,11 @@ package com.example.TeleprompterAndroid;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,7 +22,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
@@ -31,6 +37,10 @@ public class AuthHelper {
     private DatabaseReference databaseReference;
     private FirebaseStorage storage;
     private StorageReference storageReference;
+
+    public FirebaseAuth getFirebaseAuth() {
+        return firebaseAuth;
+    }
 
     public AuthHelper (Activity activity) {
         this.activity = activity;
@@ -125,5 +135,53 @@ public class AuthHelper {
 
     public StorageReference getFilesReference() {
         return storageReference.child(getUId()).child("files");
+    }
+
+    public int getTextColorFromSnapshot(DataSnapshot snapshot) {
+        try {
+            return snapshot.child("textColor").getValue(Integer.class);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public int getBackgroundColorFromSnapshot(DataSnapshot snapshot) {
+        try {
+            return snapshot.child("bgColor").getValue(Integer.class);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public void saveTextColor(int finalI) {
+        getSettingsReference().child("textColor").setValue(finalI);
+    }
+
+    public void saveBgColor(int finalI) {
+        getSettingsReference().child("bgColor").setValue(finalI);
+    }
+
+    public UploadTask getSaveAvatarUploadTask(ImageView imageView) {
+        // Get the data from an ImageView as bytes
+        imageView.setDrawingCacheEnabled(true);
+        imageView.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        return getAvatarReference().putBytes(data);
+    }
+
+    public StorageReference getAvatarReference() {
+        return storageReference.child(getUId()).child("avatar.jpeg");
+    }
+
+    public void signOut () {
+        firebaseAuth.signOut();
+    }
+
+    public void updateUserName(String name) {
+        getNameReference().setValue(name);
     }
 }

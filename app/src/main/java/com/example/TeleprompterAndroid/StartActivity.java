@@ -20,10 +20,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
+
 public class StartActivity extends AppCompatActivity {
 
     private EditText login, pass;
-    private View broadcastButton, bluetoothButton, wifiButton, tabletBroadcastButtons;
+    //private View broadcastButton, bluetoothButton, wifiButton, tabletBroadcastButtons;
     private AuthHelper authHelper;
 
     @Override
@@ -33,29 +35,29 @@ public class StartActivity extends AppCompatActivity {
 
         login = findViewById(R.id.email_sign_in_et);
         pass = findViewById(R.id.password_sign_in_et);
-        broadcastButton = findViewById(R.id.broadcast_button_sign_in);
-        bluetoothButton = findViewById(R.id.bluetooth_button_sign_in);
-        wifiButton = findViewById(R.id.wifi_button_sign_in);
-        tabletBroadcastButtons = findViewById(R.id.tablet_broadcast_buttons);
+        //broadcastButton = findViewById(R.id.broadcast_button_sign_in);
+        //bluetoothButton = findViewById(R.id.bluetooth_button_sign_in);
+        //wifiButton = findViewById(R.id.wifi_button_sign_in);
+        //tabletBroadcastButtons = findViewById(R.id.tablet_broadcast_buttons);
 
         authHelper = new AuthHelper(this);
 
-        broadcastButton.setOnClickListener(v -> tabletBroadcastButtons.setVisibility((tabletBroadcastButtons.getVisibility() == View.GONE) ? View.VISIBLE : View.GONE));
+        //broadcastButton.setOnClickListener(v -> tabletBroadcastButtons.setVisibility((tabletBroadcastButtons.getVisibility() == View.GONE) ? View.VISIBLE : View.GONE));
 
-        bluetoothButton.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), ReadActivity.class)));
-        wifiButton.setOnClickListener(v -> Toast.makeText(getApplicationContext(), "Функция недоступна", Toast.LENGTH_SHORT).show());
+        //bluetoothButton.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), ReadActivity.class)));
+        //wifiButton.setOnClickListener(v -> Toast.makeText(getApplicationContext(), "Функция недоступна", Toast.LENGTH_SHORT).show());
 
-        setTestParams(); //TODO: Remove this string!
+        //setTestParams();
     }
 
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        /*FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = authHelper.getFirebaseAuth().getCurrentUser();
         if(currentUser != null){
-            startActivity(new Intent(getApplicationContext(), NewMainActivity.class));
-        }*/
+            startActivity(new Intent(getApplicationContext(), NewMainActivity.class).putExtra(IS_AUTHED, true));
+        }
     }
 
 
@@ -76,6 +78,6 @@ public class StartActivity extends AppCompatActivity {
     }
 
     public void Skip (View view) {
-        startActivity(new Intent(getApplicationContext(), NewMainActivity.class).putExtra("IS_AUTHED", false));
+        startActivity(new Intent(getApplicationContext(), NewMainActivity.class).putExtra(IS_AUTHED, false));
     }
 }

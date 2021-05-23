@@ -8,6 +8,9 @@ public class Consts {
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_CONNECTED = 3;
 
+    public static final int STARED_SUCCESS = 1;
+    public static final int STARED_FAIL = 0;
+
     public static final int CHANGE_SPEED = 4;
     public static final int CHANGE_SCRIPT = 5;
     public static final int CHANGE_SCRIPT_MIDDLE = 19;
@@ -17,6 +20,8 @@ public class Consts {
     public static final int CHANGE_TEXT_SIZE = 7;
     public static final int CHANGE_MODE = 8;
     public static final int CHANGE_ALL = 18;
+    public static final int CHANGE_TEXT_COLOR = 22;
+    public static final int CHANGE_BACKGROUND_COLOR = 23;
 
     public static final int MESSAGE_STATE_CHANGE = 9;
     public static final int MESSAGE_READ = 10;
@@ -43,6 +48,29 @@ public class Consts {
     public static final String IS_AUTHED = "is_authed";
 
     public static final int PICK_HTML_FILE = 2;
+    public static final int CREATE_HTML_FILE = 3;
+    public static final int PICK_JPEG_FILE = 4;
+
+    public static final String SETTINGS = "SETTINGS";
+
+    public static final String[] colors = {
+            "#F44336",
+            "#E91E63",
+            "#9C27B0",
+            "#673AB7",
+            "#3F51B5",
+            "#2196F3",
+            "#03A9F4",
+            "#00BCD4",
+            "#009688",
+            "#4CAF50",
+            "#8BC34A",
+            "#CDDC39",
+            "#FFEB3B",
+            "#FFC107",
+            "#FF9800",
+            "#FF5722"
+    };
 
     public static final UUID MY_UUID = UUID.fromString("85293a76-ff18-4797-b07c-987201c2285e");
 

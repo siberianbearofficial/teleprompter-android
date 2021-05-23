@@ -408,10 +408,10 @@ public class WriteActivity extends AppCompatActivity {
 
         if ((speed > 0) && (textSize > 0) && (script.length() > 0)) {
             if (script.length() <= 500) {
-                writeController.changeAll(textSize, speed, script, mirroring);
+                writeController.changeAll(textSize, speed, script, mirroring, "", "");
                 return;
             }
-            writeController.changeAll(textSize, speed, "some", mirroring);
+            writeController.changeAll(textSize, speed, "some", mirroring, "", "");
             new Thread(() -> {
                 try {
                     Thread.sleep(100);

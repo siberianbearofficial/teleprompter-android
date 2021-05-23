@@ -1,6 +1,9 @@
 package com.example.TeleprompterAndroid;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -13,11 +16,16 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,9 +40,11 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.example.TeleprompterAndroid.Consts.CREATE_HTML_FILE;
 import static com.example.TeleprompterAndroid.Consts.FILE_DATE;
 import static com.example.TeleprompterAndroid.Consts.FILE_NAME;
 import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
@@ -42,6 +52,9 @@ import static com.example.TeleprompterAndroid.Consts.FILE_SPEED;
 import static com.example.TeleprompterAndroid.Consts.FILE_STAR;
 import static com.example.TeleprompterAndroid.Consts.FILE_TEXT_SIZE;
 import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
+import static com.example.TeleprompterAndroid.Consts.PICK_HTML_FILE;
+import static com.example.TeleprompterAndroid.Consts.STARED_FAIL;
+import static com.example.TeleprompterAndroid.Consts.STARED_SUCCESS;
 
 public class MainActivityFragment extends Fragment {
 
@@ -52,6 +65,8 @@ public class MainActivityFragment extends Fragment {
     private TextView userDisplayName;
     private AuthHelper authHelper;
     private ImageView avatar;
+
+    private Dialog dialog;
 
     private boolean isAuthed;
 
@@ -85,6 +100,8 @@ public class MainActivityFragment extends Fragment {
 
         isAuthed = is_authed_got;
 
+        setupChooseFileDialog();
+
         userDisplayName = layout.findViewById(R.id.user_displayName);
         avatar = layout.findViewById(R.id.avatar_main);
 
@@ -114,6 +131,13 @@ public class MainActivityFragment extends Fragment {
                 }
             });
 
+            layout.findViewById(R.id.sign_out_button).setOnClickListener(v -> {
+                authHelper.signOut();
+                startActivity(new Intent(getContext(), StartActivity.class));
+            });
+
+            downloadAvatar();
+
             //Show all files to open
 
             listAllFiles();
@@ -121,6 +145,7 @@ public class MainActivityFragment extends Fragment {
         } else {
             userDisplayName.setText(getString(R.string.guest));
             avatar.setImageResource(R.drawable.guest_avatar);
+            layout.findViewById(R.id.sign_out_button).setVisibility(View.GONE);
             fragmentManager.beginTransaction().add(R.id.files_container, new GuestFragment()).commit();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.files_container, new DevelopedByFragment());
@@ -136,21 +161,18 @@ public class MainActivityFragment extends Fragment {
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
-                if (msg.what != 101010) {
+                if (msg.what == PICK_HTML_FILE) {
                     startActivity(fileHelper.prepareIntent(msg, textsize, speed));
                     uploadFile();
-                } else if (!creditsAdded) {
+                } else if (msg.what == CREATE_HTML_FILE) {
+                    //TODO: Open editor fragment with new created file
+                    ((NewMainActivity) getActivity()).setUriForCreatingFile(fileHelper.getFinalUri());
+                } else {
                     FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
                     fragmentTransaction.add(R.id.files_container, new DevelopedByFragment());
                     fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
-                    creditsAdded = true;
-                    try {
-                        thread.join();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
         };
@@ -164,41 +186,46 @@ public class MainActivityFragment extends Fragment {
         fileHelper.sendFileToHandler(requestCode, resultCode, data, handler);
     }
 
-    private int listSize;
-    private int currNumber;
-    private Thread thread;
-    private boolean creditsAdded = false;
-
     private void listAllFiles() {
         authHelper.getFilesReference().listAll()
                 .addOnSuccessListener(listResult -> {
-                    listSize = listResult.getItems().size();
-                    Log.e("ListSize", String.valueOf(listSize));
-                    currNumber = 0;
                     for (StorageReference item : listResult.getItems()) {
                         putMetadataInFile(item.getName(), item, new FileFragment(), getChildFragmentManager());
                     }
-                    thread = new Thread(() -> {
-                        try {
-                            if (currNumber == listSize - 1 && !creditsAdded) {
-                                Thread.sleep(1000);
-                                Message message = new Message();
-                                message.what = 101010;
-                                handler.sendMessage(message);
-                            }
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }); thread.start();
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    private void updateStared(StorageReference fileReference, boolean stared) {
+    public void updateStared(StorageReference fileReference, boolean stared) {
         fileReference.updateMetadata(new StorageMetadata.Builder().setCustomMetadata(FILE_STAR, stared ? "true" : "false").build())
                 .addOnFailureListener((OnFailureListener) exception -> {
                     Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void downloadAvatar() {
+        final long ONE_GYGABYTE = 1024 * 1024 * 1024;
+
+        authHelper.getAvatarReference().getBytes(ONE_GYGABYTE).addOnSuccessListener(bytes -> {
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            avatar.setImageBitmap(bitmap);
+        }).addOnFailureListener(exception -> {
+            Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
+        });
+
+    }
+
+    public void updateStared(String fileName, Handler handler, boolean stared) {
+        authHelper.getFileReference(fileName).updateMetadata(new StorageMetadata.Builder().setCustomMetadata(FILE_STAR, stared ? "true" : "false").build())
+                .addOnSuccessListener(storageMetadata -> {
+                    Message message = new Message();
+                    message.what = STARED_SUCCESS;
+                    handler.sendMessage(message);
+                })
+                .addOnFailureListener((OnFailureListener) exception -> {
+                    Message message = new Message();
+                    message.what = STARED_FAIL;
+                    handler.sendMessage(message);
                 });
     }
 
@@ -206,7 +233,7 @@ public class MainActivityFragment extends Fragment {
         reference.getMetadata().addOnSuccessListener((OnSuccessListener<StorageMetadata>) storageMetadata -> {
             Bundle args = new Bundle();
             args.putString(FILE_NAME, fileName);
-            args.putString(FILE_DATE, new Date(storageMetadata.getUpdatedTimeMillis()).toString());
+            args.putString(FILE_DATE, new SimpleDateFormat("dd.MM.yy").format(new Date(storageMetadata.getUpdatedTimeMillis())));
             args.putBoolean(FILE_STAR, storageMetadata.getCustomMetadata(FILE_STAR).equals("true"));
             args.putInt(FILE_TEXT_SIZE, textsize);
             args.putInt(FILE_SPEED, speed);
@@ -214,7 +241,6 @@ public class MainActivityFragment extends Fragment {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.files_container, fileFragment);
             fragmentTransaction.commit();
-            currNumber++;
         }).addOnFailureListener((OnFailureListener) exception -> {
             Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
         });
@@ -232,6 +258,62 @@ public class MainActivityFragment extends Fragment {
         }).addOnSuccessListener((OnSuccessListener<UploadTask.TaskSnapshot>) taskSnapshot -> {
             Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
             updateStared(storageReference, false);
+        });
+    }
+
+    private void setupChooseFileDialog () {
+        dialog = new Dialog(getContext());
+
+        dialog.setTitle(getString(R.string.file_creation));
+
+        dialog.setContentView(R.layout.dialog_choose_file_location);
+
+        AtomicBoolean checked = new AtomicBoolean(true);
+
+        EditText fileName = dialog.findViewById(R.id.file_name_edit_text);
+        RadioGroup fileLocationRadioGroup = dialog.findViewById(R.id.file_location_radio_group);
+        Button chooseFileLocationButton = dialog.findViewById(R.id.choose_file_location_button);
+        Button createFileButton = dialog.findViewById(R.id.create_file_button_dialog);
+
+        fileName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (checked.get())
+                    createFileButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+        fileLocationRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (checkedId) {
+                case R.id.account_radio_button:
+                    checked.set(true);
+                    chooseFileLocationButton.setVisibility(View.GONE);
+                    break;
+                case R.id.disc_radio_button:
+                    checked.set(false);
+                    chooseFileLocationButton.setVisibility(View.VISIBLE);
+                    createFileButton.setVisibility(View.GONE);
+                    break;
+            }
+        });
+
+        chooseFileLocationButton.setOnClickListener(v -> {
+            chooseFileLocationButton.setVisibility(View.GONE);
+            createFileButton.setVisibility(View.VISIBLE);
+            fileHelper.createFile(fileName.getText().toString()+".html");
+        });
+
+        createFileButton.setOnClickListener(v -> {
+            if (checked.get())
+                ((NewMainActivity) getActivity()).openEditorActivityFragmentForServerFile(fileName.getText().toString()+".html");
+            else ((NewMainActivity) getActivity()).openEditorActivityFragmentWithFile();
+            dialog.dismiss();
         });
     }
 
@@ -258,7 +340,8 @@ public class MainActivityFragment extends Fragment {
 
     private void Create () {
         //startActivity(new Intent(getContext(), EditorActivityBluetoothDevice.class).putExtra(FILE_SPEED, Integer.toString(speed)).putExtra(FILE_TEXT_SIZE, Integer.toString(textsize)).putExtra(FILE_SCRIPT, "Write something..."));
-        ((NewMainActivity) getActivity()).openEditorActivityFragment("Test", "Write this!");
+        //((NewMainActivity) getActivity()).openEditorActivityFragment("Test", "Write this!");
+        dialog.show();
     }
 
     private void Upload () {fileHelper.openFile();}

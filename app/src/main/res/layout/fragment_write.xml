@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".WriteActivity">
 
     <View
@@ -159,6 +160,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
             android:layout_marginBottom="30dp"
@@ -193,19 +195,12 @@
                         android:text="@string/text"
                         android:textAppearance="@style/color_text" />
 
-                    <!--<View
+                    <ImageButton
+                        android:id="@+id/change_text_color_write_fragment"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:layout_marginEnd="10dp"
-                        android:background="@drawable/color_square" />-->
-
-
-                    <fragment
-                        android:id="@+id/fragment5"
-                        android:name="com.example.TeleprompterAndroid.TestPreferenceFragment"
-                        android:layout_width="32dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_height="32dp"/>
+                        android:background="#FFC107" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -223,11 +218,12 @@
                         android:text="@string/background"
                         android:textAppearance="@style/color_text" />
 
-                    <View
+                    <ImageButton
+                        android:id="@+id/change_background_color_write_fragment"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:layout_marginEnd="10dp"
-                        android:background="@drawable/color_square_2" />
+                        android:background="#4CAF50" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

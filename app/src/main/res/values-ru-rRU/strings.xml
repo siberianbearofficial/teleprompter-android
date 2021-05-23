@@ -28,4 +28,17 @@
     <string name="developed_by">Разработчик: Алексей Орлов\nДизайнер: Юрий Морозов</string>
     <string name="use_app_buttons">Используйте кнопки в приложении</string>
     <string name="return_back">Вернуться назад</string>
+    <string name="account_radio_button">Ваш аккаунт</string>
+    <string name="disc_radio_button">Внутренняя память</string>
+    <string name="file_location">Расположение файла</string>
+    <string name="choose_file_location_in_storage">Выберите расположение во внутренней памяти</string>
+    <string name="file_name">Имя файла</string>
+    <string name="create_file">Создать</string>
+    <string name="file_creation">Создание файла</string>
+    <string name="open_play_or_write_mode">На каком устройстве показать текст?</string>
+    <string name="on_this_device">На этом</string>
+    <string name="broadcast">Транслировать на другое</string>
+    <string name="choose_color">Выберите цвет</string>
+    <string name="password_confirm_hint">Подтвердите пароль</string>
+    <string name="wait_text">Подождите, пока текст полностью отправится</string>
 </resources>

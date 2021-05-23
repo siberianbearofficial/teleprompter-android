@@ -1,26 +1,41 @@
 package com.example.TeleprompterAndroid;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chinalwb.are.AREditText;
 import com.chinalwb.are.AREditor;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.w3c.dom.Text;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import static com.example.TeleprompterAndroid.Consts.FILE_NAME;
 import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
+import static com.example.TeleprompterAndroid.Consts.FILE_STAR;
+import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
 
 public class EditorActivityFragment extends Fragment {
 
@@ -29,13 +44,16 @@ public class EditorActivityFragment extends Fragment {
     private ImageButton PlayButton, SaveButton, ShareButton, BackButton;
     private TextView TitleTV;
 
+    private boolean saveToServer;
+
     public EditorActivityFragment() {}
 
-    public static EditorActivityFragment newInstance(String param1, String param2) {
+    public static EditorActivityFragment newInstance(String title, String script, boolean isAuthed) {
         EditorActivityFragment fragment = new EditorActivityFragment();
         Bundle args = new Bundle();
-        args.putString(FILE_SCRIPT, param1);
-        args.putString(FILE_NAME, param2);
+        args.putString(FILE_NAME, title);
+        args.putString(FILE_SCRIPT, script);
+        args.putBoolean(IS_AUTHED, isAuthed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -44,9 +62,11 @@ public class EditorActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            saveToServer = getArguments().getBoolean(IS_AUTHED);
             script = getArguments().getString(FILE_SCRIPT);
             title = getArguments().getString(FILE_NAME);
         } else {
+            saveToServer = false;
             script = "";
             title = "New file";
         }
@@ -77,10 +97,31 @@ public class EditorActivityFragment extends Fragment {
         TitleTV.setText(title);
 
         SaveButton.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Unavailable feature", Toast.LENGTH_SHORT).show();
+            if (saveToServer) {
+                uploadFile(FileHelper.writeContentToInputStream(arEditText.getHtml()), title);
+            } else {
+                Uri uri = ((NewMainActivity) getActivity()).getUriForCreatingFile();
+                FileHelper.writeScriptToUri(arEditText.getHtml(), uri, getActivity());
+            }
         });
         PlayButton.setOnClickListener(v -> {
-            ((NewMainActivity) getActivity()).openWriteActivityFragment(arEditText.getHtml());
+            Dialog dialog = new Dialog(getContext());
+            dialog.setTitle(getString(R.string.file_creation));
+            dialog.setContentView(R.layout.dialog_choose_play_type);
+
+            Button playButton = dialog.findViewById(R.id.on_this_device_choose_dialog);
+            Button broadcastButton = dialog.findViewById(R.id.broadcast_choose_dialog);
+
+            playButton.setOnClickListener(v1 -> {
+                ((NewMainActivity) getActivity()).openPlayActivityFragment(arEditText.getHtml());
+                dialog.dismiss();
+            });
+            broadcastButton.setOnClickListener(v1 -> {
+                ((NewMainActivity) getActivity()).openWriteActivityFragment(arEditText.getHtml());
+                dialog.dismiss();
+            });
+
+            dialog.show();
         });
         ShareButton.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Unavailable feature", Toast.LENGTH_SHORT).show();
@@ -90,5 +131,24 @@ public class EditorActivityFragment extends Fragment {
         });
 
         return layout;
+    }
+
+    private void uploadFile (InputStream file, String fileName) {
+        AuthHelper authHelper = new AuthHelper(getActivity());
+        StorageReference storageReference = authHelper.getFileReference(fileName);
+        UploadTask uploadTask = storageReference.putStream(file);
+        uploadTask.addOnFailureListener((OnFailureListener) exception -> {
+            Toast.makeText(getContext(), "Error! Message: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+        }).addOnSuccessListener((OnSuccessListener<UploadTask.TaskSnapshot>) taskSnapshot -> {
+            Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
+            updateStared(storageReference, false);
+        });
+    }
+
+    private void updateStared(StorageReference fileReference, boolean stared) {
+        fileReference.updateMetadata(new StorageMetadata.Builder().setCustomMetadata(FILE_STAR, stared ? "true" : "false").build())
+                .addOnFailureListener((OnFailureListener) exception -> {
+                    Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
+                });
     }
 }

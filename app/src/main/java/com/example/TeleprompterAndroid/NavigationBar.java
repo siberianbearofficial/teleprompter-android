@@ -24,12 +24,15 @@ public class NavigationBar extends Fragment {
         playButton = layout.findViewById(R.id.navigation_bar_play);
         settingsButton = layout.findViewById(R.id.navigation_bar_settings);
 
+        colorButton(0);
+
         homeButton.setOnClickListener(v -> {
             colorButton(0);
             ((NewMainActivity) getActivity()).openMainActivityFragment();
         });
         profileButton.setOnClickListener(v -> {
             colorButton(1);
+            ((NewMainActivity) getActivity()).openProfileFragment();
         });
         playButton.setOnClickListener(v -> {
             colorButton(2);
@@ -37,6 +40,7 @@ public class NavigationBar extends Fragment {
         });
         settingsButton.setOnClickListener(v -> {
             colorButton(3);
+            ((NewMainActivity) getActivity()).openSettingsActivityFragment();
         });
 
         return layout;

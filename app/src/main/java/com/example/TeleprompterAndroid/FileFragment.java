@@ -3,13 +3,18 @@ package com.example.TeleprompterAndroid;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -21,6 +26,7 @@ import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
 import static com.example.TeleprompterAndroid.Consts.FILE_SPEED;
 import static com.example.TeleprompterAndroid.Consts.FILE_STAR;
 import static com.example.TeleprompterAndroid.Consts.FILE_TEXT_SIZE;
+import static com.example.TeleprompterAndroid.Consts.STARED_SUCCESS;
 
 public class FileFragment extends Fragment {
 
@@ -60,14 +66,37 @@ public class FileFragment extends Fragment {
         }
     }
 
+    private Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            if (msg.what == STARED_SUCCESS) {
+                updateStarIV();
+            } else {
+                Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
+                star = !star;
+                updateStarIV();
+            }
+        }
+    };
+
+    private ImageView starIV;
+
+    private void updateStarIV() {
+        starIV.setImageResource(star ? R.drawable.filled_star_icon : R.drawable.star_icon);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View layout = inflater.inflate(R.layout.fragment_file, container, false);
         TextView nameTV = layout.findViewById(R.id.file_name), dateTV = layout.findViewById(R.id.file_date);
-        ImageView starIV = layout.findViewById(R.id.file_star);
+        starIV = layout.findViewById(R.id.file_star);
         nameTV.setText(name); dateTV.setText(date);
         if (star) starIV.setImageResource(R.drawable.filled_star_icon);
+        starIV.setOnClickListener(v -> {
+            star = !star;
+            ((MainActivityFragment) getParentFragment()).updateStared(name, handler, star);
+        });
         nameTV.setOnClickListener(v -> {
             try {
                 ((MainActivityFragment) getParentFragment()).downloadFile(name);

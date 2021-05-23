@@ -1,6 +1,7 @@
 package com.example.TeleprompterAndroid;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.icu.util.Measure;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,10 +16,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import static com.example.TeleprompterAndroid.Consts.CHANGE_BACKGROUND_COLOR;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_MIRRORING;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_MODE;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_SCRIPT;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_SPEED;
+import static com.example.TeleprompterAndroid.Consts.CHANGE_TEXT_COLOR;
 import static com.example.TeleprompterAndroid.Consts.CHANGE_TEXT_SIZE;
 import static com.example.TeleprompterAndroid.Consts.PAUSE_MODE;
 import static com.example.TeleprompterAndroid.Consts.PLAY_MODE;
@@ -76,6 +79,14 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
                         case CHANGE_MIRRORING:
                             boolean mirroring = (boolean) msg.obj;
                             if (mirroring) mirrorTextOn(); else mirrorTextOff();
+                            break;
+                        case CHANGE_TEXT_COLOR:
+                            String textColor = (String) msg.obj;
+                            setTextColor(Color.parseColor(textColor));
+                            break;
+                        case CHANGE_BACKGROUND_COLOR:
+                            String bgColor = (String) msg.obj;
+                            setBackgroundColor(Color.parseColor(bgColor));
                             break;
                         case CHANGE_MODE:
                             int mode = (int) msg.obj;
@@ -249,5 +260,19 @@ public class NewScrollTEXT extends androidx.appcompat.widget.AppCompatTextView i
     //reverse text to normal
     public void mirrorTextOff() {
         setScaleX(1);
+    }
+
+    public void changeTextColor(String textColor) {
+        Message msg = new Message();
+        msg.obj = textColor;
+        msg.arg1 = CHANGE_TEXT_COLOR;
+        handler.sendMessage(msg);
+    }
+
+    public void changeBackGroundColor(String bgColor) {
+        Message msg = new Message();
+        msg.obj = bgColor;
+        msg.arg1 = CHANGE_BACKGROUND_COLOR;
+        handler.sendMessage(msg);
     }
 }

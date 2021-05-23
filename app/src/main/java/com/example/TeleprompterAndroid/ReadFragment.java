@@ -111,8 +111,8 @@ public class ReadFragment extends Fragment {
                 case CHANGE_ALL:
                     String gotString = (String) msg.obj;
                     String[] parts = gotString.split("_");
-                    int textsize2 = Integer.parseInt(parts[0]); int speed2 = Integer.parseInt(parts[1]); String script2 = parts[2]; boolean mirroring2 = parts[2].equals("true");
-                    scrollTextView.changeTextSize(textsize2); scrollTextView.changeScript(script2); scrollTextView.changeMirroring(mirroring2); scrollTextView.changeSpeed(speed2);
+                    int textsize2 = Integer.parseInt(parts[0]); int speed2 = Integer.parseInt(parts[1]); String script2 = parts[2]; boolean mirroring2 = parts[3].equals("true"); String textColor = parts[4], bgColor = parts[5];
+                    scrollTextView.changeTextSize(textsize2); scrollTextView.changeScript(script2); scrollTextView.changeMirroring(mirroring2); scrollTextView.changeSpeed(speed2); scrollTextView.changeTextColor(textColor); scrollTextView.changeBackGroundColor(bgColor);
                     Log.e("ReadActivity", "CHANGE_ALL: textSize - " + textsize2 + ", speed - " + speed2 + ", script - " + script2 + ", mirroring - " + (mirroring2 ? "true" : "false"));
                     break;
                 case MESSAGE_DEVICE_OBJECT:

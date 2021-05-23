@@ -155,13 +155,13 @@ public class WriteController {
         setStatus(STATE_NONE);
     }
 
-    public void changeAll (int textSize, int speed, String script, boolean mirroring) {
+    public void changeAll (int textSize, int speed, String script, boolean mirroring, String textColor, String bgColor) {
         WriteThread writeThread;
         synchronized (this) {
             if (status != STATE_CONNECTED) return;
             writeThread = this.writeThread;
         }
-        String toSend = CHANGE_ALL + SYSTEM_REGEX + textSize + "_" + speed + "_" + script + "_" + (mirroring ? "true" : "false");
+        String toSend = CHANGE_ALL + SYSTEM_REGEX + textSize + "_" + speed + "_" + script + "_" + (mirroring ? "true" : "false") + "_" + textColor + "_" + bgColor;
         writeThread.send(toSend.getBytes());
     }
 

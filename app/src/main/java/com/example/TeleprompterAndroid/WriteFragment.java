@@ -8,6 +8,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,6 +25,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -31,27 +35,34 @@ import android.widget.Toast;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.util.Set;
 
 import static com.example.TeleprompterAndroid.Consts.BLUETOOTH_SOLICITATION;
 import static com.example.TeleprompterAndroid.Consts.DEVICE_OBJECT;
 import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
+import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_DEVICE_OBJECT;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_STATE_CHANGE;
 import static com.example.TeleprompterAndroid.Consts.MESSAGE_TOAST;
 import static com.example.TeleprompterAndroid.Consts.PAUSE_MODE;
 import static com.example.TeleprompterAndroid.Consts.PLAY_MODE;
+import static com.example.TeleprompterAndroid.Consts.SETTINGS;
 import static com.example.TeleprompterAndroid.Consts.STATE_CONNECTED;
 import static com.example.TeleprompterAndroid.Consts.STATE_CONNECTING;
 import static com.example.TeleprompterAndroid.Consts.STATE_LISTEN;
 import static com.example.TeleprompterAndroid.Consts.STATE_NONE;
 import static com.example.TeleprompterAndroid.Consts.STOP_MODE;
+import static com.example.TeleprompterAndroid.Consts.colors;
 
 public class WriteFragment extends Fragment {
 
     private TextView status;
     private TextView textsizeView;
+    private ImageButton changeTextColorSettings;
+    private ImageButton changeBackgroundColorSettings;
+    private ImageButton pauseButton;
     private View btnConnectView;
     private SeekBar speedView;
     private Dialog dialog;
@@ -66,16 +77,20 @@ public class WriteFragment extends Fragment {
     private boolean mirroring = false;
     private boolean paused = false;
     private boolean connect = true;
+    private boolean isAuthed;
     private int speed = 1;
     private String script = "";
-    private int textsize = 16;
+    private int textSize = 16;
+    private int textColor;
+    private int bgColor;
 
     public WriteFragment() {}
 
-    public static WriteFragment newInstance(String script) {
+    public static WriteFragment newInstance(String script, boolean isAuthed) {
         WriteFragment fragment = new WriteFragment();
         Bundle args = new Bundle();
         args.putString(FILE_SCRIPT, script);
+        args.putBoolean(IS_AUTHED, isAuthed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -85,6 +100,7 @@ public class WriteFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             script = getArguments().getString(FILE_SCRIPT);
+            isAuthed = getArguments().getBoolean(IS_AUTHED);
         }
     }
 
@@ -113,29 +129,52 @@ public class WriteFragment extends Fragment {
             startActivityForResult(enableBtIntent, BLUETOOTH_SOLICITATION);
         }
 
-        authHelper = new AuthHelper(getActivity());
+        if (isAuthed) {
+            authHelper = new AuthHelper(getActivity());
 
-        authHelper.getSettingsReference().addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int speedGot = authHelper.getSpeedFromSnapshot(snapshot);
-                int textSizeGot = authHelper.getTextSizeFromSnapshot(snapshot);
+            authHelper.getSettingsReference().addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    int speedGot = authHelper.getSpeedFromSnapshot(snapshot);
+                    int textSizeGot = authHelper.getTextSizeFromSnapshot(snapshot);
+                    int textColorGot = authHelper.getTextColorFromSnapshot(snapshot);
+                    int bgColorGor = authHelper.getBackgroundColorFromSnapshot(snapshot);
 
-                if (speedGot != -1)
-                    speed = speedGot;
+                    if (speedGot != -1)
+                        speed = speedGot;
 
-                if (textSizeGot != -1)
-                    textsize = textSizeGot;
+                    if (textSizeGot != -1)
+                        textSize = textSizeGot;
 
-                textsizeView.setText(Integer.toString(textsize));
-                speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
+                    if (textColorGot != -1)
+                        textColor = textColorGot;
+
+                    if (bgColorGor != -1)
+                        bgColor = bgColorGor;
+
+                    textsizeView.setText(Integer.toString(textSize));
+                    speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            String settingsString = ((NewMainActivity) getActivity()).sharedPreferences.getString(SETTINGS, "-1");
+            if (!settingsString.equals("-1")) {
+                Gson gson = new Gson();
+                Settings settings;
+                settings = gson.fromJson(settingsString, Settings.class);
+                textColor = settings.textColorId;
+                bgColor = settings.bgColorId;
+                textSize = settings.textSize;
+                speed = settings.speed;
             }
+        }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show(); }
-        });
-
-        textsizeView.setText(Integer.toString(textsize));
+        textsizeView.setText(Integer.toString(textSize));
         speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
 
         return layout;
@@ -174,7 +213,7 @@ public class WriteFragment extends Fragment {
                 case MESSAGE_DEVICE_OBJECT:
                     connectingDevice = msg.getData().getParcelable(DEVICE_OBJECT);
                     Toast.makeText(getContext(), "Connected to " + connectingDevice.getName(), Toast.LENGTH_SHORT).show();
-                    changeAll(textsize, speed, script, mirroring);
+                    changeAll(textSize, speed, script, mirroring, colors[textColor], colors[bgColor]);
                     break;
                 case MESSAGE_TOAST:
                     Toast.makeText(getContext(), msg.getData().getString("toast"),
@@ -298,15 +337,13 @@ public class WriteFragment extends Fragment {
     }
 
     private void findViewsByIds(View layout) {
-
-        //TODO: CHANGE ALL IDs!
-
         status = layout.findViewById(R.id.status_write_fragment);
         btnConnectView = layout.findViewById(R.id.btnConnectView_fragment);
         textsizeView = layout.findViewById(R.id.size_textfield_fragment);
         speedView = layout.findViewById(R.id.speed_seekbar_control_fragment);
 
-        layout.findViewById(R.id.pause_button_write_fragment).setOnClickListener(v -> {
+        pauseButton = layout.findViewById(R.id.pause_button_write_fragment);
+        pauseButton.setOnClickListener(v -> {
             Pause();
         });
 
@@ -330,6 +367,24 @@ public class WriteFragment extends Fragment {
             ((NewMainActivity) getActivity()).openMainActivityFragment();
         });
 
+        changeTextColorSettings = layout.findViewById(R.id.change_text_color_write_fragment);
+        changeBackgroundColorSettings = layout.findViewById(R.id.change_background_color_write_fragment);
+
+        changeTextColorSettings.setOnClickListener(v -> {
+            Dialog dialog = new Dialog(getActivity());
+            dialog.setTitle(getString(R.string.choose_color));
+            dialog.setContentView(R.layout.dialog_choose_color);
+            setColorsOnClickListeners(dialog, true);
+            dialog.show();
+        });
+        changeBackgroundColorSettings.setOnClickListener(v -> {
+            Dialog dialog = new Dialog(getActivity());
+            dialog.setTitle(getString(R.string.choose_color));
+            dialog.setContentView(R.layout.dialog_choose_color);
+            setColorsOnClickListeners(dialog, false);
+            dialog.show();
+        });
+
         btnConnectView.setOnClickListener(v -> Connect());
         speedView.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -350,25 +405,73 @@ public class WriteFragment extends Fragment {
         });
     }
 
+    private final int[] buttonIds = {
+            R.id.color_1,
+            R.id.color_2,
+            R.id.color_3,
+            R.id.color_4,
+            R.id.color_5,
+            R.id.color_6,
+            R.id.color_7,
+            R.id.color_8,
+            R.id.color_9,
+            R.id.color_10,
+            R.id.color_11,
+            R.id.color_12,
+            R.id.color_13,
+            R.id.color_14,
+            R.id.color_15,
+            R.id.color_16
+    };
+
+    private void setColorsOnClickListeners(Dialog dialog, boolean text) {
+        Button[] buttons = new Button[16];
+
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = dialog.findViewById(buttonIds[i]);
+            int finalI = i;
+            buttons[i].setOnClickListener(v -> {
+                if (text) {
+                    textColor = finalI;
+                    changeColor(textColor);
+                }
+                else {
+                    bgColor = finalI;
+                    changeBackgroundColor(bgColor);
+                }
+                dialog.dismiss();
+            });
+        }
+    }
+
+    private void changeBackgroundColor(int i) {
+        changeBackgroundColorSettings.setBackgroundColor(Color.parseColor(colors[i]));
+    }
+
+    private void changeColor(int i) {
+        changeTextColorSettings.setBackgroundColor(Color.parseColor(colors[i]));
+    }
+
     public void Stop () {
         changeMode(STOP_MODE);
     }
 
     public void Pause () {
         paused = !paused;
+        pauseButton.setImageResource(paused ? R.drawable.play_button_write_fragment : R.drawable.pause_button);
         changeMode((paused) ? PAUSE_MODE : PLAY_MODE);
     }
 
     public void IncreaseTextSize () {
-        textsize++;
-        textsizeView.setText(Integer.toString(textsize));
-        changeTextSize(textsize);
+        textSize++;
+        textsizeView.setText(Integer.toString(textSize));
+        changeTextSize(textSize);
     }
 
     public void ReduceTextSize () {
-        textsize--;
-        textsizeView.setText(Integer.toString(textsize));
-        changeTextSize(textsize);
+        textSize--;
+        textsizeView.setText(Integer.toString(textSize));
+        changeTextSize(textSize);
     }
 
     public void Mirror () {
@@ -408,6 +511,8 @@ public class WriteFragment extends Fragment {
     private void changeMode (int mode) {
         if (writeController.getStatus() != STATE_CONNECTED) {
             Toast.makeText(getContext(), "No connection!", Toast.LENGTH_SHORT).show();
+            paused = !paused;
+            pauseButton.setImageResource(paused ? R.drawable.play_button_write_fragment : R.drawable.pause_button);
             return;
         }
 
@@ -443,7 +548,7 @@ public class WriteFragment extends Fragment {
         writeController.changeMirroring(mirroring);
     }
 
-    private void changeAll (int textSize, int speed, String script, boolean mirroring) {
+    private void changeAll (int textSize, int speed, String script, boolean mirroring, String textColor, String bgColor) {
         if (writeController.getStatus() != STATE_CONNECTED) {
             Toast.makeText(getContext(), "No connection!", Toast.LENGTH_SHORT).show();
             return;
@@ -451,10 +556,10 @@ public class WriteFragment extends Fragment {
 
         if ((speed > 0) && (textSize > 0) && (script.length() > 0)) {
             if (script.length() <= 500) {
-                writeController.changeAll(textSize, speed, script, mirroring);
+                writeController.changeAll(textSize, speed, script, mirroring, textColor, bgColor);
                 return;
             }
-            writeController.changeAll(textSize, speed, "some", mirroring);
+            writeController.changeAll(textSize, speed, "", mirroring, textColor, bgColor);
             new Thread(() -> {
                 try {
                     Thread.sleep(100);

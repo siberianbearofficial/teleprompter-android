@@ -6,28 +6,39 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.DocumentsProvider;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
+import static android.app.Activity.RESULT_OK;
+import static com.example.TeleprompterAndroid.Consts.CREATE_HTML_FILE;
 import static com.example.TeleprompterAndroid.Consts.FILE_NAME;
 import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
 import static com.example.TeleprompterAndroid.Consts.PICK_HTML_FILE;
+import static com.example.TeleprompterAndroid.Consts.PICK_JPEG_FILE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FileHelper {
 
@@ -46,6 +57,25 @@ public class FileHelper {
             intent.setType("text/*");
 
             activity.startActivityForResult(intent, PICK_HTML_FILE);
+        }
+    }
+
+    public void createFile(String fileName) {
+        if (isStoragePermissionGranted()) {
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("text/*");
+            intent.putExtra(Intent.EXTRA_TITLE, fileName);
+            activity.startActivityForResult(intent, CREATE_HTML_FILE);
+        }
+    }
+
+    public void openNewAvatar() {
+        if (isStoragePermissionGranted()) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/jpeg");
+            activity.startActivityForResult(intent, PICK_JPEG_FILE);
         }
     }
 
@@ -75,8 +105,23 @@ public class FileHelper {
                 total.append(line).append('\n');
             }
             content = total.toString();
+            r.close();
         } catch (Exception e) {content = e.toString();}
         return content;
+    }
+
+    private Bitmap getImageFromUri(Uri uri) throws IOException {
+        return MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
+    }
+
+    public static void writeScriptToUri(String script, Uri uri, Activity activity) {
+        try {
+            ContentResolver contentResolver = activity.getContentResolver();
+            OutputStream out = contentResolver.openOutputStream(uri);
+            BufferedWriter w = new BufferedWriter(new OutputStreamWriter(out));
+            w.write(script);
+            w.close();
+        } catch (Exception e) {Toast.makeText(activity.getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();}
     }
 
     private boolean isStoragePermissionGranted() {
@@ -93,7 +138,7 @@ public class FileHelper {
     }
 
     public void sendFileToHandler (int requestCode, int resultCode, Intent resultData, Handler handler) {
-        if (requestCode == PICK_HTML_FILE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == PICK_HTML_FILE && resultCode == RESULT_OK) {
             // The result data contains a URI for the document or directory that
             // the user selected.
 
@@ -118,8 +163,40 @@ public class FileHelper {
                         bundle.putString(FILE_NAME, parts[parts.length - 1]);
                     } catch (Exception e) {e.printStackTrace(); bundle.putString(FILE_SCRIPT, activity.getString(R.string.no_file)); bundle.putString(FILE_NAME, activity.getString(R.string.no_file)); Toast.makeText(activity.getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();}
                     m.obj = bundle;
+                    m.what = requestCode;
                     handler.sendMessage(m);
                 }); thread.start();
+            }
+        } else if (requestCode == CREATE_HTML_FILE && resultCode == RESULT_OK) {
+            Uri uri;
+
+            if (resultData != null) {
+                uri = resultData.getData();
+                // Perform operations on the document using its URI.
+
+                finalUri = uri;
+
+                Message message = new Message();
+                message.what = requestCode;
+                handler.sendMessage(message);
+            }
+        } else if (requestCode == PICK_JPEG_FILE && resultCode == RESULT_OK) {
+            Uri uri;
+
+            if (resultData != null) {
+                uri = resultData.getData();
+                // Perform operations on the document using its URI.
+
+                finalUri = uri;
+
+                Message message = new Message();
+                message.what = requestCode;
+                new Thread(() -> {
+                    try {
+                        message.obj = getImageFromUri(finalUri);
+                        handler.sendMessage(message);
+                    } catch (Exception ignored) {}
+                }).start();
             }
         }
     }
@@ -144,5 +221,9 @@ public class FileHelper {
             total.append(line).append('\n');
         }
         return total.toString();
+    }
+
+    public static InputStream writeContentToInputStream(String content) {
+        return new ByteArrayInputStream(content.getBytes(UTF_8));
     }
 }

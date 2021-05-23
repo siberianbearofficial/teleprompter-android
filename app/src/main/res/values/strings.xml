@@ -56,4 +56,34 @@
     <string name="copyright" translatable="false">©SBC</string>
     <string name="test_editor_title" translatable="false">Телепрограм...</string>
     <string name="return_back">Go back</string>
+    <string name="account_radio_button">Your account</string>
+    <string name="disc_radio_button">Your file storage</string>
+    <string name="file_location">File location</string>
+    <string name="choose_file_location_in_storage">Choose location in local storage</string>
+    <string name="file_name">File name</string>
+    <string name="create_file">Create</string>
+    <string name="file_creation">File creation</string>
+    <string name="open_play_or_write_mode">Where to show text?</string>
+    <string name="on_this_device">On this device</string>
+    <string name="broadcast">Broadcast to another device</string>
+    <string name="choose_color">Choose color</string>
+    <string name="password_confirm_hint">Verify your password</string>
+    <string name="wait_text">Wait while text is being sent</string>
+    <string name="about_text" translatable="false">Добро пожаловать в приложение TelePROmoter!\n
+Здесь вы можете узнать, как наше приложение может помочь вам.\n
+В приложении доступны:\n
+1. Создание нового текста.\n
+Вы можете создать новый текст нажав кнопку с плюсиком в меню!\n
+2. Загрузка текста с телефона.\n
+Вы можете загрузить уже готовый текст нажав кнопку со стрелкой вверх в меню!\n
+3. Редактор текста.\n
+Вы можете редактировать текст прямо в приложении, когда выберете какой текст хотите использовать\n
+4. Проигрывание текста\n
+Вы можете начать проигрывание выбранного текста нажав кнопку плей снизу в навигации.\n
+5. Отправка и загрузка текста из облака.\n
+Все ваши созданные тексты автоматически сохраняются в облаке и вы можете открыть их после закрытия приложения.\n
+6. Дистанционное управление с помощью пульта.\n
+Вы можете управлять текстом с помощью пульта, подключив его через bluetooth. Подробнее о кнопках на фото.\n
+7. Соединение телефона и планшета и дистанционное управление телефоном.\n
+Для этого соедините устройства wifi или bluetooth и включите режим совместного использования в приложении </string>
 </resources>
