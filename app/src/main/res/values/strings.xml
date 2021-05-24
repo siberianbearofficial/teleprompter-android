@@ -69,6 +69,9 @@
     <string name="choose_color">Choose color</string>
     <string name="password_confirm_hint">Verify your password</string>
     <string name="wait_text">Wait while text is being sent</string>
+    <string name="should_save_to_server">Do you want to add this file to your account or just open it?</string>
+    <string name="should_save">Save and open</string>
+    <string name="just_open">Just open</string>
     <string name="about_text" translatable="false">Добро пожаловать в приложение TelePROmoter!\n
 Здесь вы можете узнать, как наше приложение может помочь вам.\n
 В приложении доступны:\n

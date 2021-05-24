@@ -214,6 +214,17 @@ public class FileHelper {
         return new Intent(activity.getApplicationContext(), WriteActivity.class).putExtra("SCRIPT", fileScript).putExtra("TEXTSIZE", Integer.toString(textSize)).putExtra("SPEED", Integer.toString(speed));
     }
 
+    public Bundle getArguments(Message message) {
+        Bundle bundle = (Bundle) message.obj;
+        String fileName = bundle.getString(FILE_NAME);
+        if (fileName.equals(activity.getString(R.string.no_file))) {
+            Toast.makeText(activity.getApplicationContext(), activity.getString(R.string.no_file), Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        bundle.putString(FILE_NAME, getFileName());
+        return bundle;
+    }
+
     public String readContentFromFile(File file) throws IOException {
         BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         StringBuilder total = new StringBuilder();

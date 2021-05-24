@@ -41,4 +41,7 @@
     <string name="choose_color">Выберите цвет</string>
     <string name="password_confirm_hint">Подтвердите пароль</string>
     <string name="wait_text">Подождите, пока текст полностью отправится</string>
+    <string name="should_save_to_server">Вы хотите загрузить этот файл в свой аккаунт или просто открыть?</string>
+    <string name="should_save">Сохранить и открыть</string>
+    <string name="just_open">Просто открыть</string>
 </resources>

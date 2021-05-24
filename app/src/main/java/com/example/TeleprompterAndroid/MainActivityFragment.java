@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.example.TeleprompterAndroid.Consts.CREATE_HTML_FILE;
@@ -154,16 +155,31 @@ public class MainActivityFragment extends Fragment {
             fragmentTransaction.commit();
         }
 
-
-
         fileHelper = new FileHelper(getActivity());
 
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 if (msg.what == PICK_HTML_FILE) {
-                    startActivity(fileHelper.prepareIntent(msg, textsize, speed));
-                    uploadFile();
+                    //startActivity(fileHelper.prepareIntent(msg, textsize, speed));
+                    Bundle arguments = fileHelper.getArguments(msg);
+                    Dialog dialog = new Dialog(getContext());
+                    dialog.setTitle(R.string.should_save_to_server);
+                    dialog.setContentView(R.layout.dialog_should_save_to_server);
+                    Uri uri = fileHelper.getFinalUri();
+                    dialog.findViewById(R.id.save_and_open_button).setOnClickListener(v -> {
+                        arguments.putBoolean(IS_AUTHED, true);
+                        ((NewMainActivity) getActivity()).openEditorActivityFragment(arguments);
+                        uploadFile(uri, arguments.getString(FILE_NAME));
+                        dialog.dismiss();
+                    });
+                    dialog.findViewById(R.id.just_open_button).setOnClickListener(v -> {
+                        arguments.putBoolean(IS_AUTHED, false);
+                        ((NewMainActivity) getActivity()).setUriForCreatingFile(uri);
+                        ((NewMainActivity) getActivity()).openEditorActivityFragment(arguments);
+                        dialog.dismiss();
+                    });
+                    dialog.show();
                 } else if (msg.what == CREATE_HTML_FILE) {
                     //TODO: Open editor fragment with new created file
                     ((NewMainActivity) getActivity()).setUriForCreatingFile(fileHelper.getFinalUri());
@@ -234,7 +250,7 @@ public class MainActivityFragment extends Fragment {
             Bundle args = new Bundle();
             args.putString(FILE_NAME, fileName);
             args.putString(FILE_DATE, new SimpleDateFormat("dd.MM.yy").format(new Date(storageMetadata.getUpdatedTimeMillis())));
-            args.putBoolean(FILE_STAR, storageMetadata.getCustomMetadata(FILE_STAR).equals("true"));
+            args.putBoolean(FILE_STAR, Objects.equals(storageMetadata.getCustomMetadata(FILE_STAR), "true"));
             args.putInt(FILE_TEXT_SIZE, textsize);
             args.putInt(FILE_SPEED, speed);
             fileFragment.setArguments(args);
@@ -257,6 +273,18 @@ public class MainActivityFragment extends Fragment {
             Toast.makeText(getContext(), "Error! Message: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
         }).addOnSuccessListener((OnSuccessListener<UploadTask.TaskSnapshot>) taskSnapshot -> {
             Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
+            updateStared(storageReference, false);
+        });
+    }
+
+    private void uploadFile (Uri file, String fileName) {
+        StorageReference storageReference = authHelper.getFileReference(fileName);
+        UploadTask uploadTask = storageReference.putFile(file);
+
+        uploadTask.addOnFailureListener((OnFailureListener) exception -> {
+            //Toast.makeText(getContext(), "Error! Message: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+        }).addOnSuccessListener((OnSuccessListener<UploadTask.TaskSnapshot>) taskSnapshot -> {
+            //Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
             updateStared(storageReference, false);
         });
     }

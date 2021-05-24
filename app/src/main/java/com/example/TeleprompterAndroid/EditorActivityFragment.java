@@ -94,6 +94,9 @@ public class EditorActivityFragment extends Fragment {
             arEditText.setTypeface(getResources().getFont(R.font.montserrat_alternates_light));
         }
 
+        if (title.length() > 8) {
+            title = title.substring(0, 5) + "...";
+        }
         TitleTV.setText(title);
 
         SaveButton.setOnClickListener(v -> {

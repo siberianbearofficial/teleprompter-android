@@ -98,6 +98,21 @@ public class NewMainActivity extends AppCompatActivity {
         Bundle arguments = new Bundle();
         arguments.putString(FILE_NAME, title);
         arguments.putString(FILE_SCRIPT, script);
+        arguments.putBoolean(IS_AUTHED, isAuthed);
+        EditorActivityFragment editorActivityFragment = new EditorActivityFragment();
+        editorActivityFragment.setArguments(arguments);
+        fragmentTransaction.replace(R.id.main_fragment_view, editorActivityFragment);
+        fragmentTransaction.commit();
+    }
+
+    public void openEditorActivityFragment(Bundle arguments) {
+        shouldUseRC = false;
+        if (readFragment != null)
+            readFragment.onDestroy();
+        if (writeFragment != null)
+            writeFragment.onDestroy();
+        navigationBar.setVisibility(View.GONE);
+        fragmentTransaction = fragmentManager.beginTransaction();
         EditorActivityFragment editorActivityFragment = new EditorActivityFragment();
         editorActivityFragment.setArguments(arguments);
         fragmentTransaction.replace(R.id.main_fragment_view, editorActivityFragment);

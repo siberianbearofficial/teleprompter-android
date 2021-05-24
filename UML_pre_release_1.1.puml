@@ -1,0 +1,418 @@
+@startuml
+class com.example.TeleprompterAndroid.PlayFragment {
+- AuthHelper authHelper
+- NewScrollTEXT scrollTextView
+- LinearLayout containerView
+- boolean mirroring
+- boolean paused
+- int speed
+- int speedPercent
+- String script
+- int textSize
+- boolean isAuthed
+- boolean canChangeSpeed
+- int textColor
++ {static} PlayFragment newInstance(String,boolean)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ boolean onKeyDown(int,KeyEvent)
+- void changeSpeed(int)
+- void setupScrollingTextView(int,int)
+}
+class com.example.TeleprompterAndroid.Consts {
++ {static} int STATE_NONE
++ {static} int STATE_LISTEN
++ {static} int STATE_CONNECTING
++ {static} int STATE_CONNECTED
++ {static} int STARED_SUCCESS
++ {static} int STARED_FAIL
++ {static} int CHANGE_SPEED
++ {static} int CHANGE_SCRIPT
++ {static} int CHANGE_SCRIPT_MIDDLE
++ {static} int CHANGE_SCRIPT_START
++ {static} int CHANGE_SCRIPT_END
++ {static} int CHANGE_MIRRORING
++ {static} int CHANGE_TEXT_SIZE
++ {static} int CHANGE_MODE
++ {static} int CHANGE_ALL
++ {static} int CHANGE_TEXT_COLOR
++ {static} int CHANGE_BACKGROUND_COLOR
++ {static} int MESSAGE_STATE_CHANGE
++ {static} int MESSAGE_READ
++ {static} int MESSAGE_WRITE
++ {static} int MESSAGE_DEVICE_OBJECT
++ {static} int MESSAGE_TOAST
++ {static} int BLUETOOTH_SOLICITATION
++ {static} int PAUSE_MODE
++ {static} int PLAY_MODE
++ {static} int STOP_MODE
++ {static} String DEVICE_OBJECT
++ {static} String SYSTEM_REGEX
++ {static} String APP_NAME
++ {static} String FILE_NAME
++ {static} String FILE_DATE
++ {static} String FILE_STAR
++ {static} String FILE_TEXT_SIZE
++ {static} String FILE_SPEED
++ {static} String FILE_SCRIPT
++ {static} String IS_AUTHED
++ {static} int PICK_HTML_FILE
++ {static} int CREATE_HTML_FILE
++ {static} int PICK_JPEG_FILE
++ {static} String SETTINGS
++ {static} String[] colors
++ {static} UUID MY_UUID
+}
+class com.example.TeleprompterAndroid.FileHelper {
+- Activity activity
+- Uri finalUri
+- String fileName
++ void openFile()
++ void createFile(String)
++ void openNewAvatar()
++ String getFileName()
+- String getScriptFromUri(Uri)
+- Bitmap getImageFromUri(Uri)
++ {static} void writeScriptToUri(String,Uri,Activity)
+- boolean isStoragePermissionGranted()
++ void sendFileToHandler(int,int,Intent,Handler)
++ Uri getFinalUri()
++ Intent prepareIntent(Message,int,int)
++ String readContentFromFile(File)
++ {static} InputStream writeContentToInputStream(String)
+}
+
+class com.example.TeleprompterAndroid.EditorActivityFragment {
+- String script
+- AREditor arEditor
+- ImageButton PlayButton
+- TextView TitleTV
+- boolean saveToServer
++ {static} EditorActivityFragment newInstance(String,String,boolean)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+- void uploadFile(InputStream,String)
+- void updateStared(StorageReference,boolean)
+}
+class com.example.TeleprompterAndroid.FileFragment {
+- String name
+- String date
+- String script
+- int speed
+- int textSize
+- boolean star
+- Handler handler
+- ImageView starIV
++ {static} FileFragment newInstance(String,String,boolean,int,int,String)
++ void onCreate(Bundle)
+- void updateStarIV()
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+class com.example.TeleprompterAndroid.NewMainActivity {
+- {static} boolean isAuthed
+- FragmentManager fragmentManager
+- FragmentTransaction fragmentTransaction
+- LinearLayout navigationBar
+- MainActivityFragment mainActivityFragment
+- ReadFragment readFragment
+- WriteFragment writeFragment
+- PlayFragment playFragment
+- ProfileFragment profileFragment
++ SharedPreferences sharedPreferences
+- Uri UriForCreatingFile
+- boolean shouldUseRC
+# void onCreate(Bundle)
+- void setNavigationBar()
++ void openEditorActivityFragment(String,String)
++ void openMainActivityFragment()
++ void openWriteActivityFragment(String)
++ void openReadActivityFragment()
++ void openPlayActivityFragment(String)
++ void openSettingsActivityFragment()
++ void openProfileFragment()
+# void onActivityResult(int,int,Intent)
+- void getAllArticles()
++ void openEditorActivityFragmentForServerFile(String)
++ void setUriForCreatingFile(Uri)
++ Uri getUriForCreatingFile()
++ void openEditorActivityFragmentWithFile()
++ void openAboutFragment()
++ void onBackPressed()
++ boolean onKeyDown(int,KeyEvent)
+}
+class com.example.TeleprompterAndroid.ProfileFragment {
+- AuthHelper authHelper
+- FileHelper fileHelper
+- ImageView avatar
+- EditText profileName
+- TextView displayName
+- ImageButton saveButton
+- boolean isAuthed
+- Handler handler
++ {static} ProfileFragment newInstance(boolean)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onActivityResult(int,int,Intent)
+- void uploadAvatar()
+- void downloadAvatar()
+}
+class com.example.TeleprompterAndroid.MainActivityFragment {
+- int textsize
+- int speed
+- Handler handler
+- FileHelper fileHelper
+- TextView userDisplayName
+- AuthHelper authHelper
+- ImageView avatar
+- Dialog dialog
+- boolean isAuthed
+- boolean is_authed_got
++ {static} MainActivityFragment newInstance(boolean)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onActivityResult(int,int,Intent)
+- void listAllFiles()
++ void updateStared(StorageReference,boolean)
+- void downloadAvatar()
++ void updateStared(String,Handler,boolean)
+- void putMetadataInFile(String,StorageReference,FileFragment,FragmentManager)
+- void uploadFile()
+- void setupChooseFileDialog()
++ void downloadFile(String)
+- void BluetoothWriteMode()
+- void Create()
+- void Upload()
+- void Broadcast()
+- void ToSettingsActivity()
+}
+class com.example.TeleprompterAndroid.RegisterActivity {
+- EditText NameET
+- AuthHelper authHelper
+# void onCreate(Bundle)
++ void SignUp(View)
++ void ToLoginActivity(View)
+}
+class com.example.TeleprompterAndroid.WriteFragment {
+- TextView status
+- TextView textsizeView
+- ImageButton changeTextColorSettings
+- ImageButton changeBackgroundColorSettings
+- ImageButton pauseButton
+- View btnConnectView
+- SeekBar speedView
+- Dialog dialog
+- BluetoothAdapter bluetoothAdapter
+- ArrayAdapter<String> discoveredDevicesAdapter
+- BluetoothDevice connectingDevice
+- WriteController writeController
+- AuthHelper authHelper
+- boolean mirroring
+- boolean paused
+- boolean connect
+- boolean isAuthed
+- int speed
+- String script
+- int textSize
+- int textColor
+- int bgColor
+- Handler handler
+- int[] buttonIds
+- BroadcastReceiver broadcastReceiver
++ {static} WriteFragment newInstance(String,boolean)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+- void setStatus(String)
++ void chatLeave()
+- void showDevicesDialog()
++ void onActivityResult(int,int,Intent)
+- void connectToDevice(String)
+- void findViewsByIds(View)
+- void setColorsOnClickListeners(Dialog,boolean)
+- void changeBackgroundColor(int)
+- void changeColor(int)
++ void Stop()
++ void Pause()
++ void IncreaseTextSize()
++ void ReduceTextSize()
++ void Mirror()
+- void Connect()
+- void changeScript(String)
+- void changeTextSize(int)
+- void changeMode(int)
+- void changeSpeed(int)
+- void changeMirroring(boolean)
+- void changeAll(int,int,String,boolean,String,String)
++ void onStart()
++ void onResume()
++ void onDestroy()
+}
+class com.example.TeleprompterAndroid.NewScrollTEXT {
+- {static} float DEFAULT_SPEED
+- Scroller scroller
+- float speed
+- boolean continuousScrolling
+- Handler handler
+- boolean pause
+- boolean pauseFlag
+- int pauseY
+- void setup(Context)
+# void onLayout(boolean,int,int,int,int)
++ void changeScript(String)
++ void changeTextSize(int)
++ void changeMirroring(boolean)
++ void changeSpeed(int)
++ void changeMode(int)
++ {static} int toSpeedValue(int)
++ {static} int toPercentValue(int)
+- void scroll()
++ void run()
++ void setSpeed(float)
++ float getSpeed()
++ void setContinuousScrolling(boolean)
++ boolean isContinuousScrolling()
++ void mirrorTextOn()
++ void mirrorTextOff()
++ void changeTextColor(String)
++ void changeBackGroundColor(String)
+}
+
+class com.example.TeleprompterAndroid.Settings {
++ int speed
++ int textSize
++ int textColorId
++ int bgColorId
+}
+class com.example.TeleprompterAndroid.WriteController {
+- BluetoothAdapter bluetoothAdapter
+- Handler handler
+- AcceptThread serverThread
+- ClientThread clientThread
+- WriteThread writeThread
+- int status
+- void setStatus(int)
++ int getStatus()
++ void start()
++ void connect(BluetoothDevice)
++ void connected(BluetoothSocket,BluetoothDevice)
++ void stop()
++ void changeAll(int,int,String,boolean,String,String)
++ void changeMirroring(boolean)
++ void changeSpeed(int)
++ void changeTextSize(int)
++ void changeMode(int)
++ void changeScript(String)
+- {static} String[] splitByNumber(String,int)
+- void connectionFailed()
+- void connectionLost()
+}
+class com.example.TeleprompterAndroid.SettingsActivityFragment {
+- SeekBar speedSB
+- TextView textSizeTV
+- ImageButton changeTextColorSettings
+- ImageButton changeBackgroundColorSettings
+- int textSize
+- int speedPercent
+- int textColorId
+- int backgroundColorId
+- Settings settings
+- AuthHelper authHelper
+- boolean isAuthed
+- int[] buttonIds
++ {static} SettingsActivityFragment newInstance(boolean)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+- void saveSettingsToPrefs()
+- void setColorsOnClickListeners(Dialog,boolean)
+- void changeBackgroundColor(int)
+- void changeColor(int)
+- void IncreaseTextSizeSettings()
+- void DecreaseTextSizeSettings()
+- void AboutThisApp()
+}
+
+class com.example.TeleprompterAndroid.ReadController {
+- BluetoothAdapter bluetoothAdapter
+- Handler handler
+- AcceptThread serverThread
+- ClientThread clientThread
+- ReadThread readThread
+- int status
+- void setStatus(int)
++ int getStatus()
++ void start()
++ void connect(BluetoothDevice)
++ void connected(BluetoothSocket,BluetoothDevice)
++ void stop()
+- void connectionFailed()
+- void connectionLost()
+}
+class com.example.TeleprompterAndroid.AuthHelper {
+- Activity activity
+- FirebaseAuth firebaseAuth
+- FirebaseDatabase firebaseDatabase
+- DatabaseReference databaseReference
+- FirebaseStorage storage
+- StorageReference storageReference
++ FirebaseAuth getFirebaseAuth()
++ boolean isPasswordCorrect(String)
++ boolean isEmailCorrect(String)
++ void registerUser(String,String,String)
++ void loginUser(String,String)
++ String getCurrentProfileName(DataSnapshot)
++ void saveUserData(String,String,String)
++ String getUId()
++ DatabaseReference getDatabaseReference()
++ DatabaseReference getNameReference()
++ DatabaseReference getSettingsReference()
++ DatabaseReference getUserReference()
++ void saveSpeed(int)
++ void saveTextSize(int)
++ int getSpeedFromSnapshot(DataSnapshot)
++ int getTextSizeFromSnapshot(DataSnapshot)
++ StorageReference getFileReference(String)
++ StorageReference getFilesReference()
++ int getTextColorFromSnapshot(DataSnapshot)
++ int getBackgroundColorFromSnapshot(DataSnapshot)
++ void saveTextColor(int)
++ void saveBgColor(int)
++ UploadTask getSaveAvatarUploadTask(ImageView)
++ StorageReference getAvatarReference()
++ void signOut()
++ void updateUserName(String)
+}
+
+class com.example.TeleprompterAndroid.ReadFragment {
+- NewScrollTEXT scrollTextView
+- LinearLayout containerView
+- BluetoothAdapter bluetoothAdapter
+- ReadController readController
+- Handler handler
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onActivityResult(int,int,Intent)
++ void onStart()
++ void onResume()
++ void onDestroy()
+- void setupScrollingTextView(int,int)
+}
+class com.example.TeleprompterAndroid.StartActivity {
+- EditText login
+- AuthHelper authHelper
+# void onCreate(Bundle)
++ void onStart()
+- void setTestParams()
++ void Login(View)
++ void ToRegistrationActivity(View)
++ void Skip(View)
+}
+
+androidx.fragment.app.Fragment <|-- com.example.TeleprompterAndroid.PlayFragment
+androidx.fragment.app.Fragment <|-- com.example.TeleprompterAndroid.FileFragment
+androidx.appcompat.app.AppCompatActivity <|-- com.example.TeleprompterAndroid.NewMainActivity
+androidx.fragment.app.Fragment <|-- com.example.TeleprompterAndroid.ProfileFragment
+androidx.fragment.app.Fragment <|-- com.example.TeleprompterAndroid.MainActivityFragment
+androidx.appcompat.app.AppCompatActivity <|-- com.example.TeleprompterAndroid.RegisterActivity
+androidx.fragment.app.Fragment <|-- com.example.TeleprompterAndroid.WriteFragment
+androidx.fragment.app.Fragment <|-- com.example.TeleprompterAndroid.SettingsActivityFragment
+androidx.fragment.app.Fragment <|-- com.example.TeleprompterAndroid.ReadFragment
+androidx.appcompat.app.AppCompatActivity <|-- com.example.TeleprompterAndroid.StartActivity
+@enduml
