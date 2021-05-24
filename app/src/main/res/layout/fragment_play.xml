@@ -4,8 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingStart="30dp"
-    android:paddingEnd="30dp"
     android:background="@color/white"
     tools:context=".PlayFragment">
 
@@ -13,5 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
         android:id="@+id/container_play_fragment" />
 </LinearLayout>

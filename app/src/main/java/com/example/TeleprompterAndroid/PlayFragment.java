@@ -52,7 +52,7 @@ public class PlayFragment extends Fragment {
     private int textSize = 16;
     private boolean isAuthed = false;
     private boolean canChangeSpeed = true;
-    private int textColor, bgColor;
+    private int textColor = 0, bgColor = 0;
 
     public PlayFragment() {}
 
@@ -140,8 +140,8 @@ public class PlayFragment extends Fragment {
 
         scrollTextView.setText(Html.fromHtml(script, Html.FROM_HTML_MODE_LEGACY));
 
-        scrollTextView.changeTextColor(colors[textColor]);
-        scrollTextView.changeBackGroundColor(colors[bgColor]);
+        scrollTextView.setTextColor(Color.parseColor(colors[textColor]));
+        scrollTextView.setBackgroundColor(Color.parseColor(colors[bgColor]));
 
         return layout;
     }
