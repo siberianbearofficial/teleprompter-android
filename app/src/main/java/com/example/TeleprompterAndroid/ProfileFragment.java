@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,9 +34,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
 import static com.example.TeleprompterAndroid.Consts.PICK_JPEG_FILE;
+import static com.example.TeleprompterAndroid.Consts.PICK_JPEG_FILE_FOR_CROPPING;
 
 public class ProfileFragment extends Fragment {
 
@@ -121,7 +124,13 @@ public class ProfileFragment extends Fragment {
         public void handleMessage(@NonNull Message msg) {
             if (msg.what == PICK_JPEG_FILE) {
                 avatar.setImageBitmap((Bitmap) msg.obj);
+            } else if (msg.what == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                Bitmap bitmap = (Bitmap) msg.obj;
+                bitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
+                avatar.setImageBitmap(bitmap);
                 uploadAvatar();
+            } else if (msg.what == PICK_JPEG_FILE_FOR_CROPPING) {
+                cropAvatar((Uri) msg.obj);
             }
         }
     };
@@ -129,6 +138,12 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         fileHelper.sendFileToHandler(requestCode, resultCode, data, handler);
+    }
+
+    private void cropAvatar(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setFixAspectRatio(true)
+                .start(getContext(), this);
     }
 
     private void uploadAvatar() {
@@ -146,7 +161,7 @@ public class ProfileFragment extends Fragment {
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             avatar.setImageBitmap(bitmap);
         }).addOnFailureListener(exception -> {
-            Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
         });
 
     }

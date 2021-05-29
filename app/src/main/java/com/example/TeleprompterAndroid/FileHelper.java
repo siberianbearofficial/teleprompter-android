@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
+import com.theartofdev.edmodo.cropper.CropImage;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -38,6 +40,7 @@ import static com.example.TeleprompterAndroid.Consts.FILE_NAME;
 import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
 import static com.example.TeleprompterAndroid.Consts.PICK_HTML_FILE;
 import static com.example.TeleprompterAndroid.Consts.PICK_JPEG_FILE;
+import static com.example.TeleprompterAndroid.Consts.PICK_JPEG_FILE_FOR_CROPPING;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FileHelper {
@@ -75,7 +78,7 @@ public class FileHelper {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("image/jpeg");
-            activity.startActivityForResult(intent, PICK_JPEG_FILE);
+            activity.startActivityForResult(intent, PICK_JPEG_FILE_FOR_CROPPING);
         }
     }
 
@@ -197,6 +200,40 @@ public class FileHelper {
                         handler.sendMessage(message);
                     } catch (Exception ignored) {}
                 }).start();
+            }
+        } else if (requestCode == PICK_JPEG_FILE_FOR_CROPPING && resultCode == RESULT_OK) {
+            Uri uri;
+
+            if (resultData != null) {
+                uri = resultData.getData();
+                // Perform operations on the document using its URI.
+
+                finalUri = uri;
+
+                Message message = new Message();
+                message.what = requestCode;
+                new Thread(() -> {
+                    try {
+                        message.obj = finalUri;
+                        handler.sendMessage(message);
+                    } catch (Exception ignored) {}
+                }).start();
+            }
+        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(resultData);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                Message message = new Message();
+                message.what = requestCode;
+                try {
+                    message.obj = getImageFromUri(resultUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                handler.sendMessage(message);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(activity.getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
             }
         }
     }

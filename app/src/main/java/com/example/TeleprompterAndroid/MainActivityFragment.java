@@ -37,6 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.IOException;
@@ -183,13 +184,13 @@ public class MainActivityFragment extends Fragment {
                 } else if (msg.what == CREATE_HTML_FILE) {
                     //TODO: Open editor fragment with new created file
                     ((NewMainActivity) getActivity()).setUriForCreatingFile(fileHelper.getFinalUri());
-                } else {
+                }/* else {
                     FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
                     fragmentTransaction.add(R.id.files_container, new DevelopedByFragment());
                     fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
-                }
+                }*/
             }
         };
 
@@ -226,7 +227,7 @@ public class MainActivityFragment extends Fragment {
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             avatar.setImageBitmap(bitmap);
         }).addOnFailureListener(exception -> {
-            Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
         });
 
     }
@@ -269,9 +270,9 @@ public class MainActivityFragment extends Fragment {
         StorageReference storageReference = authHelper.getFileReference(fileName);
         UploadTask uploadTask = storageReference.putFile(file);
 
-        uploadTask.addOnFailureListener((OnFailureListener) exception -> {
+        uploadTask.addOnFailureListener(exception -> {
             Toast.makeText(getContext(), "Error! Message: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-        }).addOnSuccessListener((OnSuccessListener<UploadTask.TaskSnapshot>) taskSnapshot -> {
+        }).addOnSuccessListener(taskSnapshot -> {
             Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
             updateStared(storageReference, false);
         });

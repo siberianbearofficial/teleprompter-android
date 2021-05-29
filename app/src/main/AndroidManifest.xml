@@ -25,6 +25,8 @@
         <activity android:name=".NewMainActivity" />
         <activity android:name=".ReadActivity" />
         <activity android:name=".WriteActivity" />
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/> <!-- optional (needed if default theme has no action bar) -->
         <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

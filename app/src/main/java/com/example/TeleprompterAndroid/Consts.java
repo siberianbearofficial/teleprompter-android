@@ -50,6 +50,7 @@ public class Consts {
     public static final int PICK_HTML_FILE = 2;
     public static final int CREATE_HTML_FILE = 3;
     public static final int PICK_JPEG_FILE = 4;
+    public static final int PICK_JPEG_FILE_FOR_CROPPING = 5;
 
     public static final String SETTINGS = "SETTINGS";
 

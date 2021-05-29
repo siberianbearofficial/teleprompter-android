@@ -38,6 +38,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-analytics'
 
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
     implementation "androidx.preference:preference:1.1.1"
     implementation 'net.margaritov.preference.colorpicker.ColorPickerPreference:ColorPickerPreference:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.9.0'

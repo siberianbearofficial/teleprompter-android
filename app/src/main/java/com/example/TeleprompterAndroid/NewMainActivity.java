@@ -33,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -210,7 +211,7 @@ public class NewMainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == BLUETOOTH_SOLICITATION) {
             readFragment.onActivityResult(requestCode, resultCode, data);
-        } else if (requestCode == PICK_JPEG_FILE) {
+        } else if (requestCode == PICK_JPEG_FILE || requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE || requestCode == PICK_JPEG_FILE_FOR_CROPPING) {
             profileFragment.onActivityResult(requestCode, resultCode, data);
         } else {
             mainActivityFragment.onActivityResult(requestCode, resultCode, data);
