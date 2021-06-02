@@ -119,8 +119,8 @@ public class WriteFragment extends Fragment {
         // Checks whether the device supports bluetooth or not
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
-            Toast.makeText(getContext(), "Bluetooth adapter is not working!", Toast.LENGTH_LONG).show();
-            getActivity().finish();
+            Toast.makeText(requireContext(), getString(R.string.bt_adapter_unavailable), Toast.LENGTH_LONG).show();
+            ((NewMainActivity) requireActivity()).openMainActivityFragment();
         }
 
         // Prompts the user to enable bluetooth
@@ -130,7 +130,7 @@ public class WriteFragment extends Fragment {
         }
 
         if (isAuthed) {
-            authHelper = new AuthHelper(getActivity());
+            authHelper = ((NewMainActivity) requireActivity()).getAuthHelper();
 
             authHelper.getSettingsReference().addValueEventListener(new ValueEventListener() {
                 @Override
@@ -152,7 +152,7 @@ public class WriteFragment extends Fragment {
                     if (bgColorGor != -1)
                         bgColor = bgColorGor;
 
-                    textsizeView.setText(Integer.toString(textSize));
+                    textsizeView.setText(String.valueOf(textSize));
                     speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
                 }
 
@@ -162,25 +162,20 @@ public class WriteFragment extends Fragment {
                 }
             });
         } else {
-            String settingsString = ((NewMainActivity) getActivity()).sharedPreferences.getString(SETTINGS, "-1");
-            if (!settingsString.equals("-1")) {
-                Gson gson = new Gson();
-                Settings settings;
-                settings = gson.fromJson(settingsString, Settings.class);
-                textColor = settings.textColorId;
-                bgColor = settings.bgColorId;
-                textSize = settings.textSize;
-                speed = settings.speed;
-            }
+            Settings settings = ((NewMainActivity) requireActivity()).getSettings();
+            textColor = settings.textColorId;
+            bgColor = settings.bgColorId;
+            textSize = settings.textSize;
+            speed = settings.speed;
         }
 
-        textsizeView.setText(Integer.toString(textSize));
+        textsizeView.setText(String.valueOf(textSize));
         speedView.setProgress(NewScrollTEXT.toPercentValue(speed));
 
         return layout;
     }
 
-    private Handler handler = new Handler(Looper.getMainLooper()) {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
 
         @Override
         public void handleMessage(Message msg) {
@@ -195,7 +190,7 @@ public class WriteFragment extends Fragment {
                             }
 
                             setStatus(name);
-                            btnConnectView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rectangle_9));
+                            btnConnectView.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rectangle_9));
                             //changeScript(script);
                             break;
                         case STATE_CONNECTING:
@@ -205,7 +200,7 @@ public class WriteFragment extends Fragment {
                         case STATE_NONE:
                             try {
                                 setStatus(getString(R.string.connect));
-                                btnConnectView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rectangle_8));
+                                btnConnectView.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rectangle_8));
                             } catch (Exception ignored) {}
                             break;
                     }
@@ -231,7 +226,7 @@ public class WriteFragment extends Fragment {
         if (writeController != null)
             writeController.stop();
 
-        btnConnectView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rectangle_8));
+        btnConnectView.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rectangle_8));
         setStatus(getString(R.string.connect));
     }
 
@@ -260,11 +255,11 @@ public class WriteFragment extends Fragment {
 
         // Records to broadcast when a device is found
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        getContext().registerReceiver(broadcastReceiver, filter);
+        requireContext().registerReceiver(broadcastReceiver, filter);
 
         // Record to broadcast when Discovery ends
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        getContext().registerReceiver(broadcastReceiver, filter);
+        requireContext().registerReceiver(broadcastReceiver, filter);
 
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 
@@ -310,23 +305,14 @@ public class WriteFragment extends Fragment {
 
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case BLUETOOTH_SOLICITATION:
-                if (resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(getContext(), "Bluetooth activated!", Toast.LENGTH_LONG).show();
-                    writeController = new WriteController(getContext(), handler);
-                } else {
-                    Toast.makeText(getContext(), "Bluetooth has not been activated, the app will be finished in 3 seconds.", Toast.LENGTH_LONG).show();
-
-                    new CountDownTimer(3000, 1000) {
-                        public void onFinish() {
-                            getActivity().finish();
-                        }
-                        public void onTick(long millisUntilFinished) {
-                            // Every 1 second (do nothing)
-                        }
-                    }.start();
-                }
+        if (requestCode == BLUETOOTH_SOLICITATION) {
+            if (resultCode == Activity.RESULT_OK) {
+                //Toast.makeText(getContext(), "Bluetooth activated!", Toast.LENGTH_LONG).show();
+                writeController = new WriteController(getContext(), handler);
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.can_not_open_read_fragment), Toast.LENGTH_LONG).show();
+                ((NewMainActivity) requireActivity()).openMainActivityFragment();
+            }
         }
     }
 

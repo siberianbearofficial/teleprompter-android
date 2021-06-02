@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="350dp"
     android:layout_height="wrap_content"
     android:padding="10dp"
     android:orientation="vertical">
@@ -31,7 +31,7 @@
 
     <RadioGroup
         android:id="@+id/file_location_radio_group"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:checkedButton="@id/account_radio_button"
         android:orientation="horizontal">
@@ -58,7 +58,7 @@
     <Button
         android:id="@+id/choose_file_location_button"
         android:visibility="gone"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:backgroundTint="@color/blue"
@@ -68,7 +68,7 @@
 
     <Button
         android:id="@+id/create_file_button_dialog"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

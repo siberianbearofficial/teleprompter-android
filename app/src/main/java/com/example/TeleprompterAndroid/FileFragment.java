@@ -66,7 +66,7 @@ public class FileFragment extends Fragment {
         }
     }
 
-    private Handler handler = new Handler(Looper.getMainLooper()) {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             if (msg.what == STARED_SUCCESS) {
@@ -95,10 +95,12 @@ public class FileFragment extends Fragment {
         if (star) starIV.setImageResource(R.drawable.filled_star_icon);
         starIV.setOnClickListener(v -> {
             star = !star;
+            assert getParentFragment() != null;
             ((MainActivityFragment) getParentFragment()).updateStared(name, handler, star);
         });
         nameTV.setOnClickListener(v -> {
             try {
+                assert getParentFragment() != null;
                 ((MainActivityFragment) getParentFragment()).downloadFile(name);
             } catch (IOException e) {
                 e.printStackTrace();

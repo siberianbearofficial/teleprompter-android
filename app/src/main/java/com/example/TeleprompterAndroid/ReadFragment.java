@@ -56,8 +56,8 @@ public class ReadFragment extends Fragment {
         // Checks whether the device supports bluetooth or not
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
-            Toast.makeText(getContext(), "Bluetooth adapter is not working!", Toast.LENGTH_LONG).show();
-            getActivity().finish();
+            Toast.makeText(getContext(), getString(R.string.bt_adapter_unavailable), Toast.LENGTH_LONG).show();
+            ((NewMainActivity) requireActivity()).openMainActivityFragment();
         }
 
         // Prompts the user to enable bluetooth
@@ -69,7 +69,7 @@ public class ReadFragment extends Fragment {
         return layout;
     }
 
-    private Handler handler = new Handler(Looper.getMainLooper()) {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
 
         @Override
         public void handleMessage(Message msg) {
@@ -136,19 +136,11 @@ public class ReadFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            Toast.makeText(getContext(), "Bluetooth activated!", Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), "Bluetooth activated!", Toast.LENGTH_LONG).show();
             readController = new ReadController(handler);
         } else {
-            Toast.makeText(getContext(), "Bluetooth has not been activated, the app will be finished in 3 seconds.", Toast.LENGTH_LONG).show();
-
-            new CountDownTimer(3000, 1000) {
-                public void onFinish() {
-                    getActivity().finish();
-                }
-
-                public void onTick(long millisUntilFinished) {
-                }
-            }.start();
+            Toast.makeText(requireContext(), getString(R.string.can_not_open_read_fragment), Toast.LENGTH_LONG).show();
+            ((NewMainActivity) requireActivity()).openMainActivityFragment();
         }
     }
 
@@ -186,7 +178,7 @@ public class ReadFragment extends Fragment {
         scrollTextView.setText("");
         scrollTextView.setTextColor(color);
         scrollTextView.setTextSize(textSize);
-        scrollTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.montserrat_alternates_light));
+        scrollTextView.setTypeface(ResourcesCompat.getFont(requireContext(), R.font.montserrat_alternates_light));
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         containerView.setPadding(30, 0, 30, 20);

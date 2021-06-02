@@ -62,6 +62,8 @@ public class NewMainActivity extends AppCompatActivity {
     private PlayFragment playFragment;
     private ProfileFragment profileFragment;
 
+    private AuthHelper authHelper;
+    private FileHelper fileHelper;
     public SharedPreferences sharedPreferences;
 
     @Override
@@ -70,6 +72,8 @@ public class NewMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_main);
 
         sharedPreferences = getPreferences(0);
+        authHelper = new AuthHelper(this);
+        fileHelper = new FileHelper(this);
 
         navigationBar = findViewById(R.id.navigation_bar_container);
 
@@ -80,6 +84,14 @@ public class NewMainActivity extends AppCompatActivity {
         openMainActivityFragment();
 
         setNavigationBar();
+    }
+
+    public AuthHelper getAuthHelper () {
+        return authHelper;
+    }
+
+    public FileHelper getFileHelper () {
+        return fileHelper;
     }
 
     private void setNavigationBar () {
@@ -191,6 +203,29 @@ public class NewMainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+    public Settings getSettings() {
+        Settings settings = new Settings();
+        String settingsString = sharedPreferences.getString(SETTINGS, "-1");
+        if (!settingsString.equals("-1")) {
+            Gson gson = new Gson();
+            settings = gson.fromJson(settingsString, Settings.class);
+        } else {
+            settings.textSize = 16;
+            settings.bgColorId = 1;
+            settings.textColorId = 0;
+            settings.speed = 1;
+        }
+        return settings;
+    }
+
+    public void setSettings(Settings settings) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String settingsString = gson.toJson(settings);
+        editor.putString(SETTINGS, settingsString);
+        editor.apply();
+    }
+
     public void openProfileFragment() {
         shouldUseRC = false;
         if (readFragment != null)
@@ -218,6 +253,7 @@ public class NewMainActivity extends AppCompatActivity {
         }
     }
 
+    // Old method
     private void getAllArticles () throws IOException {
         OkHttpClient httpClient = new OkHttpClient();
 

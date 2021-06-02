@@ -19,21 +19,23 @@
         android:fontFamily="@font/montserrat_alternates_medium" />
 
     <TextView
+        android:id="@+id/guest_fragment_main_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
+        android:fontFamily="@font/montserrat_alternates_regular"
         android:text="@string/guest_mode_attention"
-        android:textAppearance="@style/guest_mode_attention"
-        android:fontFamily="@font/montserrat_alternates_regular" />
+        android:textAppearance="@style/guest_mode_attention" />
 
     <TextView
+        android:id="@+id/please_sign_up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="@string/please_sign_up"
-        android:textAppearance="@style/please_sign_in_out"
         android:layout_gravity="center"
-        android:fontFamily="@font/montserrat_alternates_medium" />
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/montserrat_alternates_medium"
+        android:text="@string/please_sign_up"
+        android:textAppearance="@style/please_sign_in_out" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -44,11 +46,12 @@
         android:fontFamily="@font/montserrat_alternates_light" />
 
     <TextView
+        android:id="@+id/please_sign_in"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/please_sign_in"
-        android:textAppearance="@style/please_sign_in_out"
         android:layout_gravity="center"
-        android:fontFamily="@font/montserrat_alternates_medium" />
+        android:fontFamily="@font/montserrat_alternates_medium"
+        android:text="@string/please_sign_in"
+        android:textAppearance="@style/please_sign_in_out" />
 
 </LinearLayout>

@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import java.util.Objects;
+
 public class NavigationBar extends Fragment {
 
     private ImageButton homeButton, profileButton, playButton, settingsButton;
@@ -28,19 +30,19 @@ public class NavigationBar extends Fragment {
 
         homeButton.setOnClickListener(v -> {
             colorButton(0);
-            ((NewMainActivity) getActivity()).openMainActivityFragment();
+            ((NewMainActivity) requireActivity()).openMainActivityFragment();
         });
         profileButton.setOnClickListener(v -> {
             colorButton(1);
-            ((NewMainActivity) getActivity()).openProfileFragment();
+            ((NewMainActivity) requireActivity()).openProfileFragment();
         });
         playButton.setOnClickListener(v -> {
             colorButton(2);
-            ((NewMainActivity) getActivity()).openReadActivityFragment();
+            ((NewMainActivity) requireActivity()).openReadActivityFragment();
         });
         settingsButton.setOnClickListener(v -> {
             colorButton(3);
-            ((NewMainActivity) getActivity()).openSettingsActivityFragment();
+            ((NewMainActivity) requireActivity()).openSettingsActivityFragment();
         });
 
         return layout;

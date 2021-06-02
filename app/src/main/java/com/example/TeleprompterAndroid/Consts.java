@@ -55,8 +55,8 @@ public class Consts {
     public static final String SETTINGS = "SETTINGS";
 
     public static final String[] colors = {
-            "#F44336",
-            "#E91E63",
+            "#000000",
+            "#FFFFFF",
             "#9C27B0",
             "#673AB7",
             "#3F51B5",
@@ -70,7 +70,15 @@ public class Consts {
             "#FFEB3B",
             "#FFC107",
             "#FF9800",
-            "#FF5722"
+            "#FF5722",
+            "#F44336",
+            "#E91E63",
+            "#66380F",
+            "#BB671C",
+            "#000036",
+            "#F0C6A1",
+            "#D8BDB0",
+            "#D0D3B5",
     };
 
     public static final UUID MY_UUID = UUID.fromString("85293a76-ff18-4797-b07c-987201c2285e");

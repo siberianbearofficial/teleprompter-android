@@ -118,13 +118,17 @@ public class MainActivityFragment extends Fragment {
         FragmentManager fragmentManager = getChildFragmentManager();
 
         if (isAuthed) {
-            authHelper = new AuthHelper(getActivity());
+            authHelper = ((NewMainActivity) requireActivity()).getAuthHelper();
 
             authHelper.getNameReference().addValueEventListener(new ValueEventListener() {
 
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    userDisplayName.setText(authHelper.getCurrentProfileName(snapshot));
+                    try {
+                        userDisplayName.setText(authHelper.getCurrentProfileName(snapshot));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -141,13 +145,18 @@ public class MainActivityFragment extends Fragment {
             downloadAvatar();
 
             //Show all files to open
-
-            listAllFiles();
+            try {
+                listAllFiles();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         } else {
             userDisplayName.setText(getString(R.string.guest));
             avatar.setImageResource(R.drawable.guest_avatar);
-            layout.findViewById(R.id.sign_out_button).setVisibility(View.GONE);
+            layout.findViewById(R.id.sign_out_button).setOnClickListener(v -> {
+                startActivity(new Intent(getContext(), StartActivity.class));
+            });
             fragmentManager.beginTransaction().add(R.id.files_container, new GuestFragment()).commit();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(R.id.files_container, new DevelopedByFragment());
@@ -156,7 +165,7 @@ public class MainActivityFragment extends Fragment {
             fragmentTransaction.commit();
         }
 
-        fileHelper = new FileHelper(getActivity());
+        fileHelper = ((NewMainActivity) requireActivity()).getFileHelper();
 
         handler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -164,26 +173,32 @@ public class MainActivityFragment extends Fragment {
                 if (msg.what == PICK_HTML_FILE) {
                     //startActivity(fileHelper.prepareIntent(msg, textsize, speed));
                     Bundle arguments = fileHelper.getArguments(msg);
-                    Dialog dialog = new Dialog(getContext());
-                    dialog.setTitle(R.string.should_save_to_server);
-                    dialog.setContentView(R.layout.dialog_should_save_to_server);
                     Uri uri = fileHelper.getFinalUri();
-                    dialog.findViewById(R.id.save_and_open_button).setOnClickListener(v -> {
-                        arguments.putBoolean(IS_AUTHED, true);
-                        ((NewMainActivity) getActivity()).openEditorActivityFragment(arguments);
-                        uploadFile(uri, arguments.getString(FILE_NAME));
-                        dialog.dismiss();
-                    });
-                    dialog.findViewById(R.id.just_open_button).setOnClickListener(v -> {
+                    if (isAuthed) {
+                        Dialog dialog = new Dialog(getContext());
+                        dialog.setTitle(R.string.should_save_to_server);
+                        dialog.setContentView(R.layout.dialog_should_save_to_server);
+
+                        dialog.findViewById(R.id.save_and_open_button).setOnClickListener(v -> {
+                            arguments.putBoolean(IS_AUTHED, true);
+                            ((NewMainActivity) requireActivity()).openEditorActivityFragment(arguments);
+                            uploadFile(uri, arguments.getString(FILE_NAME));
+                            dialog.dismiss();
+                        });
+                        dialog.findViewById(R.id.just_open_button).setOnClickListener(v -> {
+                            arguments.putBoolean(IS_AUTHED, false);
+                            ((NewMainActivity) requireActivity()).setUriForCreatingFile(uri);
+                            ((NewMainActivity) requireActivity()).openEditorActivityFragment(arguments);
+                            dialog.dismiss();
+                        });
+                        dialog.show();
+                    } else {
                         arguments.putBoolean(IS_AUTHED, false);
-                        ((NewMainActivity) getActivity()).setUriForCreatingFile(uri);
-                        ((NewMainActivity) getActivity()).openEditorActivityFragment(arguments);
-                        dialog.dismiss();
-                    });
-                    dialog.show();
+                        ((NewMainActivity) requireActivity()).setUriForCreatingFile(uri);
+                        ((NewMainActivity) requireActivity()).openEditorActivityFragment(arguments);
+                    }
                 } else if (msg.what == CREATE_HTML_FILE) {
-                    //TODO: Open editor fragment with new created file
-                    ((NewMainActivity) getActivity()).setUriForCreatingFile(fileHelper.getFinalUri());
+                    ((NewMainActivity) requireActivity()).setUriForCreatingFile(fileHelper.getFinalUri());
                 }/* else {
                     FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
                     fragmentTransaction.add(R.id.files_container, new DevelopedByFragment());
@@ -207,7 +222,11 @@ public class MainActivityFragment extends Fragment {
         authHelper.getFilesReference().listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference item : listResult.getItems()) {
-                        putMetadataInFile(item.getName(), item, new FileFragment(), getChildFragmentManager());
+                        try {
+                            putMetadataInFile(item.getName(), item, new FileFragment(), getChildFragmentManager());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -225,7 +244,11 @@ public class MainActivityFragment extends Fragment {
 
         authHelper.getAvatarReference().getBytes(ONE_GYGABYTE).addOnSuccessListener(bytes -> {
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            avatar.setImageBitmap(bitmap);
+            try {
+                avatar.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }).addOnFailureListener(exception -> {
             // Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
         });
@@ -247,7 +270,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void putMetadataInFile(String fileName, StorageReference reference, FileFragment fileFragment, FragmentManager fragmentManager) {
-        reference.getMetadata().addOnSuccessListener((OnSuccessListener<StorageMetadata>) storageMetadata -> {
+        reference.getMetadata().addOnSuccessListener(storageMetadata -> {
             Bundle args = new Bundle();
             args.putString(FILE_NAME, fileName);
             args.putString(FILE_DATE, new SimpleDateFormat("dd.MM.yy").format(new Date(storageMetadata.getUpdatedTimeMillis())));
@@ -255,10 +278,14 @@ public class MainActivityFragment extends Fragment {
             args.putInt(FILE_TEXT_SIZE, textsize);
             args.putInt(FILE_SPEED, speed);
             fileFragment.setArguments(args);
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.files_container, fileFragment);
-            fragmentTransaction.commit();
-        }).addOnFailureListener((OnFailureListener) exception -> {
+            try {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.add(R.id.files_container, fileFragment);
+                fragmentTransaction.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).addOnFailureListener(exception -> {
             Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
         });
     }
@@ -282,9 +309,9 @@ public class MainActivityFragment extends Fragment {
         StorageReference storageReference = authHelper.getFileReference(fileName);
         UploadTask uploadTask = storageReference.putFile(file);
 
-        uploadTask.addOnFailureListener((OnFailureListener) exception -> {
+        uploadTask.addOnFailureListener(exception -> {
             //Toast.makeText(getContext(), "Error! Message: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-        }).addOnSuccessListener((OnSuccessListener<UploadTask.TaskSnapshot>) taskSnapshot -> {
+        }).addOnSuccessListener(taskSnapshot -> {
             //Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
             updateStared(storageReference, false);
         });
@@ -304,6 +331,13 @@ public class MainActivityFragment extends Fragment {
         Button chooseFileLocationButton = dialog.findViewById(R.id.choose_file_location_button);
         Button createFileButton = dialog.findViewById(R.id.create_file_button_dialog);
 
+        if (!isAuthed) {
+            fileLocationRadioGroup.check(R.id.disc_radio_button);
+            fileLocationRadioGroup.setVisibility(View.GONE);
+            chooseFileLocationButton.setVisibility(View.VISIBLE);
+            createFileButton.setVisibility(View.GONE);
+        }
+
         fileName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -313,8 +347,10 @@ public class MainActivityFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (checked.get())
-                    createFileButton.setVisibility(View.VISIBLE);
+                if (isAuthed) {
+                    if (checked.get())
+                        createFileButton.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -339,10 +375,15 @@ public class MainActivityFragment extends Fragment {
         });
 
         createFileButton.setOnClickListener(v -> {
-            if (checked.get())
-                ((NewMainActivity) getActivity()).openEditorActivityFragmentForServerFile(fileName.getText().toString()+".html");
-            else ((NewMainActivity) getActivity()).openEditorActivityFragmentWithFile();
-            dialog.dismiss();
+            if (isAuthed) {
+                if (checked.get())
+                    ((NewMainActivity) getActivity()).openEditorActivityFragmentForServerFile(fileName.getText().toString() + ".html");
+                else ((NewMainActivity) getActivity()).openEditorActivityFragmentWithFile();
+                dialog.dismiss();
+            } else {
+                ((NewMainActivity) getActivity()).openEditorActivityFragmentWithFile();
+                dialog.dismiss();
+            }
         });
     }
 

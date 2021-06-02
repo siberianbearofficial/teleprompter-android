@@ -23,6 +23,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.util.Objects;
+
 import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
 import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
 import static com.example.TeleprompterAndroid.Consts.SETTINGS;
@@ -67,10 +69,10 @@ public class SettingsActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View layout = inflater.inflate(R.layout.fragment_settings_activity, container, false);
 
-        settings = new Settings();
+        settings = ((NewMainActivity) requireActivity()).getSettings();
 
         if (isAuthed) {
-            authHelper = new AuthHelper(getActivity());
+            authHelper = ((NewMainActivity) requireActivity()).getAuthHelper();
         }
 
         speedSB = layout.findViewById(R.id.speed_seekbar_settings_fragment);
@@ -115,12 +117,20 @@ public class SettingsActivityFragment extends Fragment {
 
                     if (speedPercentGot != -1) {
                         speedPercent = speedPercentGot;
-                        speedSB.setProgress(speedPercent);
+                        try {
+                            speedSB.setProgress(speedPercent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     if (textSizeGot != -1) {
                         textSize = textSizeGot;
-                        textSizeTV.setText(Integer.toString(textSize));
+                        try {
+                            textSizeTV.setText(String.valueOf(textSize));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     if (textColorIdGot != -1) {
@@ -139,15 +149,10 @@ public class SettingsActivityFragment extends Fragment {
                 }
             });
         } else {
-            String settingsString = ((NewMainActivity) getActivity()).sharedPreferences.getString(SETTINGS, "-1");
-            if (!settingsString.equals("-1")) {
-                Gson gson = new Gson();
-                settings = gson.fromJson(settingsString, Settings.class);
-                textColorId = settings.textColorId;
-                backgroundColorId = settings.bgColorId;
-                textSize = settings.textSize;
-                speedPercent = NewScrollTEXT.toPercentValue(settings.speed);
-            }
+            textColorId = settings.textColorId;
+            backgroundColorId = settings.bgColorId;
+            textSize = settings.textSize;
+            speedPercent = NewScrollTEXT.toPercentValue(settings.speed);
 
             textSizeTV.setText(String.valueOf(textSize));
             speedSB.setProgress(speedPercent);
@@ -168,7 +173,7 @@ public class SettingsActivityFragment extends Fragment {
                 speedPercent = seekBar.getProgress();
                 if (isAuthed) authHelper.saveSpeed(NewScrollTEXT.toSpeedValue(speedPercent));
                 else {
-                    saveSettingsToPrefs();
+                    setSettings();
                 }
             }
         });
@@ -176,16 +181,12 @@ public class SettingsActivityFragment extends Fragment {
         return layout;
     }
 
-    private void saveSettingsToPrefs() {
-        SharedPreferences.Editor editor = ((NewMainActivity) getActivity()).sharedPreferences.edit();
-        Gson gson = new Gson();
+    private void setSettings() {
         settings.bgColorId = backgroundColorId;
         settings.textColorId = textColorId;
         settings.speed = NewScrollTEXT.toSpeedValue(speedPercent);
         settings.textSize = textSize;
-        String settingsString = gson.toJson(settings);
-        editor.putString(SETTINGS, settingsString);
-        editor.apply();
+        ((NewMainActivity) requireActivity()).setSettings(settings);
     }
 
     private final int[] buttonIds = {
@@ -204,7 +205,15 @@ public class SettingsActivityFragment extends Fragment {
             R.id.color_13,
             R.id.color_14,
             R.id.color_15,
-            R.id.color_16
+            R.id.color_16,
+            R.id.color_17,
+            R.id.color_18,
+            R.id.color_19,
+            R.id.color_20,
+            R.id.color_21,
+            R.id.color_22,
+            R.id.color_23,
+            R.id.color_24,
     };
 
     private void setColorsOnClickListeners(Dialog dialog, boolean text) {
@@ -220,7 +229,7 @@ public class SettingsActivityFragment extends Fragment {
                     if (isAuthed)
                         authHelper.saveTextColor(textColorId);
                     else
-                        saveSettingsToPrefs();
+                        setSettings();
                 }
                 else {
                     backgroundColorId = finalI;
@@ -228,7 +237,7 @@ public class SettingsActivityFragment extends Fragment {
                     if (isAuthed)
                         authHelper.saveBgColor(backgroundColorId);
                     else
-                        saveSettingsToPrefs();
+                        setSettings();
                 }
                 dialog.dismiss();
             });
@@ -236,11 +245,19 @@ public class SettingsActivityFragment extends Fragment {
     }
 
     private void changeBackgroundColor(int i) {
-        changeBackgroundColorSettings.setBackgroundColor(Color.parseColor(colors[i]));
+        try {
+            changeBackgroundColorSettings.setBackgroundColor(Color.parseColor(colors[i]));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void changeColor(int i) {
-        changeTextColorSettings.setBackgroundColor(Color.parseColor(colors[i]));
+        try {
+            changeTextColorSettings.setBackgroundColor(Color.parseColor(colors[i]));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void IncreaseTextSizeSettings () {
@@ -248,7 +265,7 @@ public class SettingsActivityFragment extends Fragment {
         if (isAuthed) authHelper.saveTextSize(textSize);
         else {
             textSizeTV.setText(String.valueOf(textSize));
-            saveSettingsToPrefs();
+            setSettings();
         }
     }
 
@@ -257,11 +274,11 @@ public class SettingsActivityFragment extends Fragment {
         if (isAuthed) authHelper.saveTextSize(textSize);
         else {
             textSizeTV.setText(String.valueOf(textSize));
-            saveSettingsToPrefs();
+            setSettings();
         }
     }
 
     private void AboutThisApp () {
-        ((NewMainActivity) getActivity()).openAboutFragment();
+        ((NewMainActivity) requireActivity()).openAboutFragment();
     }
 }

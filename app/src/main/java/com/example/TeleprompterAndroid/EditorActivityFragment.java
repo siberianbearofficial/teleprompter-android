@@ -31,6 +31,7 @@ import org.w3c.dom.Text;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 import static com.example.TeleprompterAndroid.Consts.FILE_NAME;
 import static com.example.TeleprompterAndroid.Consts.FILE_SCRIPT;
@@ -103,9 +104,10 @@ public class EditorActivityFragment extends Fragment {
             if (saveToServer) {
                 uploadFile(FileHelper.writeContentToInputStream(arEditText.getHtml()), title);
             } else {
-                Uri uri = ((NewMainActivity) getActivity()).getUriForCreatingFile();
+                Uri uri = ((NewMainActivity) requireActivity()).getUriForCreatingFile();
                 FileHelper.writeScriptToUri(arEditText.getHtml(), uri, getActivity());
             }
+            Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show();
         });
         PlayButton.setOnClickListener(v -> {
             Dialog dialog = new Dialog(getContext());
@@ -116,11 +118,11 @@ public class EditorActivityFragment extends Fragment {
             Button broadcastButton = dialog.findViewById(R.id.broadcast_choose_dialog);
 
             playButton.setOnClickListener(v1 -> {
-                ((NewMainActivity) getActivity()).openPlayActivityFragment(arEditText.getHtml());
+                ((NewMainActivity) requireActivity()).openPlayActivityFragment(arEditText.getHtml());
                 dialog.dismiss();
             });
             broadcastButton.setOnClickListener(v1 -> {
-                ((NewMainActivity) getActivity()).openWriteActivityFragment(arEditText.getHtml());
+                ((NewMainActivity) requireActivity()).openWriteActivityFragment(arEditText.getHtml());
                 dialog.dismiss();
             });
 
@@ -130,19 +132,19 @@ public class EditorActivityFragment extends Fragment {
             Toast.makeText(getContext(), "Unavailable feature", Toast.LENGTH_SHORT).show();
         });
         BackButton.setOnClickListener(v -> {
-            ((NewMainActivity) getActivity()).openMainActivityFragment();
+            ((NewMainActivity) requireActivity()).openMainActivityFragment();
         });
 
         return layout;
     }
 
     private void uploadFile (InputStream file, String fileName) {
-        AuthHelper authHelper = new AuthHelper(getActivity());
+        AuthHelper authHelper = ((NewMainActivity) requireActivity()).getAuthHelper();
         StorageReference storageReference = authHelper.getFileReference(fileName);
         UploadTask uploadTask = storageReference.putStream(file);
-        uploadTask.addOnFailureListener((OnFailureListener) exception -> {
+        uploadTask.addOnFailureListener(exception -> {
             Toast.makeText(getContext(), "Error! Message: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-        }).addOnSuccessListener((OnSuccessListener<UploadTask.TaskSnapshot>) taskSnapshot -> {
+        }).addOnSuccessListener(taskSnapshot -> {
             Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
             updateStared(storageReference, false);
         });

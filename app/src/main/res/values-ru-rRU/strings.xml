@@ -44,4 +44,6 @@
     <string name="should_save_to_server">Вы хотите загрузить этот файл в свой аккаунт или просто открыть?</string>
     <string name="should_save">Сохранить и открыть</string>
     <string name="just_open">Просто открыть</string>
+    <string name="can_not_open_read_fragment">Чтобы запускать тексты с другого устройства, Вам необходимо включить Bluetooth. Если Вы хотите запустить текст на этом устройстве, то запускайте прямо из редактора</string>
+    <string name="bt_adapter_unavailable">К сожалению, Bluetooth недоступен на этом устройстве, поэтому Вы не можете запускать тексты с другого устройства здесь</string>
 </resources>

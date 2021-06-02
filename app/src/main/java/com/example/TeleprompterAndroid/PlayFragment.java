@@ -22,6 +22,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.util.Objects;
+
 import static android.view.KeyEvent.KEYCODE_BUTTON_B;
 import static android.view.KeyEvent.KEYCODE_DPAD_DOWN;
 import static android.view.KeyEvent.KEYCODE_DPAD_LEFT;
@@ -80,7 +82,7 @@ public class PlayFragment extends Fragment {
         View layout = inflater.inflate(R.layout.fragment_play, container, false);
 
         if (isAuthed) {
-            authHelper = new AuthHelper(getActivity());
+            authHelper = ((NewMainActivity) requireActivity()).getAuthHelper();
 
             authHelper.getSettingsReference().addValueEventListener(new ValueEventListener() {
                 @Override
@@ -123,16 +125,11 @@ public class PlayFragment extends Fragment {
                 public void onCancelled(@NonNull DatabaseError error) { Toast.makeText(getContext(), error.toString(), Toast.LENGTH_SHORT).show(); }
             });
         } else {
-            String settingsString = ((NewMainActivity) getActivity()).sharedPreferences.getString(SETTINGS, "-1");
-            if (!settingsString.equals("-1")) {
-                Gson gson = new Gson();
-                Settings settings;
-                settings = gson.fromJson(settingsString, Settings.class);
-                textColor = settings.textColorId;
-                bgColor = settings.bgColorId;
-                textSize = settings.textSize;
-                speed = settings.speed;
-            }
+            Settings settings = ((NewMainActivity) requireActivity()).getSettings();
+            textColor = settings.textColorId;
+            bgColor = settings.bgColorId;
+            textSize = settings.textSize;
+            speed = settings.speed;
         }
 
         containerView = layout.findViewById(R.id.container_play_fragment);
@@ -246,7 +243,7 @@ public class PlayFragment extends Fragment {
         scrollTextView.setText("");
         scrollTextView.setTextColor(color);
         scrollTextView.setTextSize(textSize);
-        scrollTextView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.montserrat_alternates_light));
+        scrollTextView.setTypeface(ResourcesCompat.getFont(requireContext(), R.font.montserrat_alternates_light));
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         containerView.setPadding(30, 0, 30, 20);

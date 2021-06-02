@@ -36,6 +36,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.util.Objects;
+
 import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
 import static com.example.TeleprompterAndroid.Consts.PICK_JPEG_FILE;
 import static com.example.TeleprompterAndroid.Consts.PICK_JPEG_FILE_FOR_CROPPING;
@@ -79,10 +81,10 @@ public class ProfileFragment extends Fragment {
         displayName = layout.findViewById(R.id.user_displayName_profile_fragment);
         saveButton = layout.findViewById(R.id.button_save_profile_fragment);
 
-        fileHelper = new FileHelper(getActivity());
+        fileHelper = ((NewMainActivity) requireActivity()).getFileHelper();
 
         if (isAuthed) {
-            authHelper = new AuthHelper(getActivity());
+            authHelper = ((NewMainActivity) requireActivity()).getAuthHelper();
             avatar.setOnClickListener(v -> fileHelper.openNewAvatar());
             saveButton.setOnClickListener(v -> {
                 authHelper.updateUserName(profileName.getText().toString());
@@ -92,7 +94,11 @@ public class ProfileFragment extends Fragment {
 
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    displayName.setText(authHelper.getCurrentProfileName(snapshot));
+                    try {
+                        displayName.setText(authHelper.getCurrentProfileName(snapshot));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -119,7 +125,7 @@ public class ProfileFragment extends Fragment {
         return layout;
     }
 
-    private Handler handler = new Handler(Looper.getMainLooper()) {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             if (msg.what == PICK_JPEG_FILE) {
@@ -143,7 +149,7 @@ public class ProfileFragment extends Fragment {
     private void cropAvatar(Uri imageUri) {
         CropImage.activity(imageUri)
                 .setFixAspectRatio(true)
-                .start(getContext(), this);
+                .start(requireContext(), this);
     }
 
     private void uploadAvatar() {
@@ -159,7 +165,11 @@ public class ProfileFragment extends Fragment {
 
         authHelper.getAvatarReference().getBytes(ONE_GYGABYTE).addOnSuccessListener(bytes -> {
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            avatar.setImageBitmap(bitmap);
+            try {
+                avatar.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }).addOnFailureListener(exception -> {
             // Toast.makeText(getContext(), "Error!", Toast.LENGTH_SHORT).show();
         });
