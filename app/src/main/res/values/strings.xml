@@ -91,4 +91,5 @@
 Для этого соедините устройства wifi или bluetooth и включите режим совместного использования в приложении </string>
     <string name="can_not_open_read_fragment">To play texts from another device you have to enable Bluetooth. If you want to play text on this device than just play it from the editor</string>
     <string name="bt_adapter_unavailable">Unfortunately, Bluetooth adapter is unavailable on this device so you can\'t play texts from another device here</string>
+    <string name="no_documents_yet">Ups, you don\'t have any documents…\nIf this is your first time here, we recommend that you view the \"About this app\" section in the settings</string>
 </resources>

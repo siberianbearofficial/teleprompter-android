@@ -8,6 +8,7 @@
     android:paddingStart="25dp"
     android:paddingEnd="25dp"
     android:paddingBottom="50dp"
+    android:layout_marginTop="5dp"
     android:background="@color/white"
     tools:context=".GuestFragment">
 

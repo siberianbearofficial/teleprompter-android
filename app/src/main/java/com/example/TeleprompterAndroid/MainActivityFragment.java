@@ -221,12 +221,20 @@ public class MainActivityFragment extends Fragment {
     private void listAllFiles() {
         authHelper.getFilesReference().listAll()
                 .addOnSuccessListener(listResult -> {
+                    boolean isEmpty = true;
                     for (StorageReference item : listResult.getItems()) {
+                        isEmpty = false;
                         try {
                             putMetadataInFile(item.getName(), item, new FileFragment(), getChildFragmentManager());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    }
+                    if (isEmpty) {
+                        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+                        fragmentTransaction.add(R.id.files_container, new NoDocumentsFragment());
+                        fragmentTransaction.add(R.id.files_container, new DevelopedByFragment());
+                        fragmentTransaction.commit();
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show());

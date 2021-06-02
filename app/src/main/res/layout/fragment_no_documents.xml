@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:padding="20dp"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".NoDocumentsFragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/no_documents_fragment_main_text"
+        android:fontFamily="@font/montserrat_alternates_regular"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:text="@string/no_documents_yet" />
+
+</LinearLayout>

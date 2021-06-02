@@ -94,11 +94,11 @@ public class EditorActivityFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             arEditText.setTypeface(getResources().getFont(R.font.montserrat_alternates_light));
         }
-
+        String titleShortened = title;
         if (title.length() > 8) {
-            title = title.substring(0, 5) + "...";
+            titleShortened = title.substring(0, 5) + "...";
         }
-        TitleTV.setText(title);
+        TitleTV.setText(titleShortened);
 
         SaveButton.setOnClickListener(v -> {
             if (saveToServer) {
