@@ -26,6 +26,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.TeleprompterAndroid.Consts.IS_AUTHED;
 
@@ -99,7 +100,7 @@ public class AuthHelper {
 
     public void saveUserData (String userId, String name, String email) {getUserReference().setValue(new User(email, name)); }
 
-    public String getUId() {return firebaseAuth.getCurrentUser().getUid();}
+    public String getUId() {return Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();}
 
     public DatabaseReference getDatabaseReference () {return databaseReference;}
 
@@ -109,13 +110,13 @@ public class AuthHelper {
 
     public DatabaseReference getUserReference () {return getDatabaseReference().child("users").child(getUId());}
 
-    public void saveSpeed (int progress) {getSettingsReference().child("speed").setValue(progress);}
+    public void saveSpeed (int progress) {getSettingsReference().child("speed").setValue(String.valueOf(progress));}
 
-    public void saveTextSize (int textSize) {getSettingsReference().child("textSize").setValue(textSize);}
+    public void saveTextSize (int textSize) {getSettingsReference().child("textSize").setValue(String.valueOf(textSize));}
 
     public int getSpeedFromSnapshot(DataSnapshot snapshot) {
         try {
-            return snapshot.child("speed").getValue(Integer.class);
+            return Integer.parseInt(Objects.requireNonNull(snapshot.child("speed").getValue(String.class)));
         } catch (Exception e) {
             return -1;
         }
@@ -123,7 +124,7 @@ public class AuthHelper {
 
     public int getTextSizeFromSnapshot(DataSnapshot snapshot) {
         try {
-            return snapshot.child("textSize").getValue(Integer.class);
+            return Integer.parseInt(Objects.requireNonNull(snapshot.child("textSize").getValue(String.class)));
         } catch (Exception e) {
             return -1;
         }
@@ -139,26 +140,28 @@ public class AuthHelper {
 
     public int getTextColorFromSnapshot(DataSnapshot snapshot) {
         try {
-            return snapshot.child("textColor").getValue(Integer.class);
+            return Integer.parseInt(Objects.requireNonNull(snapshot.child("textColor").getValue(String.class)));
         } catch (Exception e) {
+            e.printStackTrace();
             return -1;
         }
     }
 
     public int getBackgroundColorFromSnapshot(DataSnapshot snapshot) {
         try {
-            return snapshot.child("bgColor").getValue(Integer.class);
+            return Integer.parseInt(Objects.requireNonNull(snapshot.child("bgColor").getValue(String.class)));
         } catch (Exception e) {
+            e.printStackTrace();
             return -1;
         }
     }
 
     public void saveTextColor(int finalI) {
-        getSettingsReference().child("textColor").setValue(finalI);
+        getSettingsReference().child("textColor").setValue(String.valueOf(finalI));
     }
 
     public void saveBgColor(int finalI) {
-        getSettingsReference().child("bgColor").setValue(finalI);
+        getSettingsReference().child("bgColor").setValue(String.valueOf(finalI));
     }
 
     public UploadTask getSaveAvatarUploadTask(ImageView imageView) {

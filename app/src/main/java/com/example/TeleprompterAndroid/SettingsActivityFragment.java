@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -141,6 +142,9 @@ public class SettingsActivityFragment extends Fragment {
                         backgroundColorId = backgroundColorIdGot;
                         changeBackgroundColor(backgroundColorId);
                     }
+
+                    String logs = "Speed: " + String.valueOf(speedPercentGot) + ", TextSize: " + String.valueOf(textSizeGot) + ", TextColor: " + String.valueOf(textColorIdGot) + ", BgColor: " + String.valueOf(backgroundColorIdGot);
+                    Log.e("SettingsGot", logs);
                 }
 
                 @Override
@@ -217,7 +221,7 @@ public class SettingsActivityFragment extends Fragment {
     };
 
     private void setColorsOnClickListeners(Dialog dialog, boolean text) {
-        Button[] buttons = new Button[16];
+        Button[] buttons = new Button[buttonIds.length];
 
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = dialog.findViewById(buttonIds[i]);
